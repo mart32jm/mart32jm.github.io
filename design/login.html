@@ -22,6 +22,18 @@
                 scope: 'user-read-private user-read-email' // Add the necessary scopes
             };
 
+            const params =  {
+                response_type: 'code',
+                client_id: clientId,
+                scope: scope,
+                code_challenge_method: 'S256',
+                code_challenge: codeChallenge, // The hashed code verifier
+                redirect_uri: redirectUri,
+            }
+
+            authUrl.search = new URLSearchParams(params).toString();
+            window.location.href = authUrl.toString(); // Redirect the user
+
             var queryString = Object.keys(queryParams)
                 .map(key => key + '=' + encodeURIComponent(queryParams[key]))
                 .join('&');
