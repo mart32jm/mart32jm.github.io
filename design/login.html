@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spotify Authorization</title>
+    <link rel="stylesheet" href="../styles/style.css">
+</head>
+<body>
+    <h1>Authorize Your Spotify Account</h1>
+    <button id="authorizeButton">Authorize</button>
+
+    <script>
+        document.getElementById('authorizeButton').addEventListener('click', function() {
+            var clientId = 'bca2a89f33694250b5b79633e3435a39';
+            var redirectUri = window.location.origin + '/callback'; // Your callback URL
+
+            var queryParams = {
+                client_id: clientId,
+                response_type: 'code',
+                redirect_uri: redirectUri,
+                scope: 'user-read-private user-read-email' // Add the necessary scopes
+            };
+
+            var queryString = Object.keys(queryParams)
+                .map(key => key + '=' + encodeURIComponent(queryParams[key]))
+                .join('&');
+
+            var authUrl = 'https://accounts.spotify.com/authorize?' + queryString;
+
+            window.location.href = authUrl;
+        });
+    </script>
+</body>
+</html>

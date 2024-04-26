@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generator</title>
+    <link rel="stylesheet" href="../styles/style.css">
+    <style>
+        .input-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
+        }
+        .white-box {
+            background-color: #fff;
+            color: #000;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+            width: 90%;
+            max-width: 800px;
+        }
+        .box-container {
+            display: flex;
+            justify-content: space-between;
+            width: 90%;
+            max-width: 800px;
+        }
+        .add-image-box {
+            background-color: #262157;
+            color: #fff;
+            width: calc(30% - 5px); 
+            height: 150px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .placeholder-box {
+            background-color: #262157; 
+            width: calc(70% - 5px); 
+            height: 200px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="generator.html" class="selected">Generator</a>
+        <a href="playlists.html">Playlists</a>
+        <a href="stats.html">Stats</a>
+        <a href="help.html">Help</a>
+        <a href="login.html" id="loginButton">Login</a>
+    </nav>
+    
+    <div class="input-container">
+        <div class="white-box">
+            Enter Your Genres!
+        </div>
+        <div class="box-container">
+            <div class="add-image-box">Add an Image</div>
+            <div class="placeholder-box"></div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
