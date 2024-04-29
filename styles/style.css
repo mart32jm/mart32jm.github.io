@@ -1,9 +1,11 @@
+/* Styles for both big and small screens */
 body {
     background-color: #0fb0f4;
     margin: 0;
     padding: 0;
     font-family: Arial, sans-serif;
 }
+
 nav {
     background-color: #000;
     color: #fff;
@@ -12,16 +14,43 @@ nav {
     justify-content: space-between;
     align-items: center;
 }
+
 nav a {
     color: #fff;
     text-decoration: none;
     padding: 10px 20px;
 }
+
 nav a:hover {
     background-color: #fff;
     color: #000;
 }
+
 .selected {
     background-color: #fff;
     color: #000;
+}
+
+/* Styles specific to big screens (min-width: 768px) */
+@media screen and (min-width: 768px) {
+    nav {
+        padding: 20px 40px;
+    }
+
+    nav a {
+        padding: 10px 30px;
+    }
+}
+
+/* Styles specific to small screens (max-width: 767px) */
+@media screen and (max-width: 767px) {
+    nav {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    nav a {
+        display: block;
+        padding: 15px 20px;
+    }
 }
