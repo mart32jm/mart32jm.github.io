@@ -43,6 +43,7 @@
 
         // Function to fetch user profile using access token
         async function fetchUserProfile(accessToken) {
+            alert('is this being accessed?');
             const response = await fetch("https://api.spotify.com/v1/me", {
                 headers: {
                     'Authorization': 'Bearer ' + accessToken,
