@@ -40,16 +40,13 @@
             return base64encode(hashed);
         }
 
-        const authorizeWithSpotify = async () => {
-            const codeVerifier = generateRandomString(64);
-            const codeChallenge = await generateCodeChallenge(codeVerifier);
-
-            window.localStorage.setItem('code_verifier', codeVerifier);
-
+        const authorizeWithSpotify = async (codeChallenge) => {
             const clientId = 'bca2a89f33694250b5b79633e3435a39';
             const redirectUri = 'http://localhost:8080'; // Update with your redirect URI
             const scope = 'user-read-private user-read-email';
             const authUrl = new URL("https://accounts.spotify.com/authorize");
+
+            window.localStorage.setItem('code_verifier', codeVerifier);
 
             const params = {
                 response_type: 'code',
@@ -64,7 +61,11 @@
             window.location.href = authUrl.toString();
         }
 
-        document.getElementById('authorizeButton').addEventListener('click', authorizeWithSpotify);
+        document.getElementById('authorizeButton').addEventListener('click', async () => {
+            const codeVerifier = generateRandomString(64);
+            const codeChallenge = await generateCodeChallenge(codeVerifier);
+            authorizeWithSpotify(codeChallenge);
+        });
 
         const getToken = async (code) => {
             const codeVerifier = localStorage.getItem('code_verifier');
