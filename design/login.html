@@ -18,85 +18,54 @@
     <script>
 
     const generateRandomString = (length) => {
-    const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    const values = crypto.getRandomValues(new Uint8Array(length));
-        return values.reduce((acc, x) => acc + possible[x % possible.length], "");  
+        const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        const values = crypto.getRandomValues(new Uint8Array(length));
+        return Array.from(values)
+            .map((x) => possible[x % possible.length])
+            .join('');
     }
 
-    const codeVerifier  = generateRandomString(64);
-
     const sha256 = async (plain) => {
-    const encoder = new TextEncoder()
-    const data = encoder.encode(plain)
-        return window.crypto.subtle.digest('SHA-256', data)
+        const encoder = new TextEncoder();
+        const data = encoder.encode(plain);
+        const hashBuffer = await window.crypto.subtle.digest('SHA-256', data);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        return hashArray.map((b) => ('00' + b.toString(16)).slice(-2)).join('');
     }
 
     const base64encode = (input) => {
-        return btoa(String.fromCharCode(...new Uint8Array(input)))
-            .replace(/=/g, '')
+        return btoa(input)
             .replace(/\+/g, '-')
-            .replace(/\//g, '_');
+            .replace(/\//g, '_')
+            .replace(/=+$/, '');
     }
 
-    const hashed = await sha256(codeVerifier)
-    const codeChallenge = base64encode(hashed);
+    document.getElementById('authorizeButton').addEventListener('click', async () => {
+        const codeVerifier = generateRandomString(64);
+        const codeChallenge = await sha256(codeVerifier);
 
-    window.localStorage.setItem('code_verifier', codeVerifier); // Save the code verifier for later
+        // Save the code verifier for later use
+        localStorage.setItem('code_verifier', codeVerifier);
 
-    const clientId = 'bca2a89f33694250b5b79633e3435a39';
-    const redirectUri = 'https://mart32jm.github.io/design/login.html';
+        const clientId = 'bca2a89f33694250b5b79633e3435a39';
+        const redirectUri = 'https://mart32jm.github.io/design/login.html';
 
-    const scope = 'user-read-private user-read-email'; // Specifies what user data your app can access!
-    const authUrl = new URL("https://accounts.spotify.com/authorize")
+        const scope = 'user-read-private user-read-email';
 
-    const params =  {
-        response_type: 'code',
-        client_id: clientId,
-        scope: scope,
-        code_challenge_method: 'S256',
-        code_challenge: codeChallenge, // The hashed code verifier
-        redirect_uri: redirectUri,
-    }
+        const authUrl = new URL("https://accounts.spotify.com/authorize");
+        const params = {
+            response_type: 'code',
+            client_id: clientId,
+            scope: scope,
+            code_challenge_method: 'S256',
+            code_challenge: base64encode(codeChallenge),
+            redirect_uri: redirectUri,
+        };
 
-    authUrl.search = new URLSearchParams(params).toString();
-    window.location.href = authUrl.toString(); // Redirect the user 
-
-    const urlParams = new URLSearchParams(window.location.search);
-    const authCode = urlParams.get('code');
-
-    // codeVerifier MUST be the same as the one used to make the code challenge for the auth request
-    codeVerifier = localStorage.getItem('code_verifier');
-
-    const payload = {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams({
-            grant_type: 'authorization_code',
-            client_id: 'bca2a89f33694250b5b79633e3435a39',
-            redirect_uri: 'https://mart32jm.github.io/design/login.html',
-            code_verifier: codeVerifier,
-            code: authCode, // From the URL
-        }),
-    }
-
-    const response = await fetch('https://accounts.spotify.com/api/token', payload);
-    const data = await response.json();
-
-    const accessToken = data.access_token;
-
-    response = await fetch("https://api.spotify.com/v1/me", {
-    headers: {
-        'Authorization': 'Bearer ' + accessToken,
-    },
+        authUrl.search = new URLSearchParams(params).toString();
+        window.location.href = authUrl.toString(); // Redirect the user 
     });
 
-    data = await response.json();
-
-
-
-
-</script>
+    </script>
 </body>
 </html>
