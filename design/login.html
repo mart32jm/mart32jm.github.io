@@ -66,6 +66,14 @@
         window.location.href = authUrl.toString(); // Redirect the user 
     });
 
+    const response = await fetch("https://api.spotify.com/v1/me", {
+    headers: {
+        'Authorization': 'Bearer ' + accessToken,
+    },
+    });
+
+    const data = await response.json();
+
     </script>
 </body>
 </html>
