@@ -91,12 +91,16 @@
             localStorage.setItem('access_token', data.access_token);
         }
 
-        const urlParams = new URLSearchParams(window.location.search);
-        const authCode = urlParams.get('code');
+        const handleAuthorizationResponse = async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const authCode = urlParams.get('code');
 
-        if (authCode) {
-            getToken(authCode);
+            if (authCode) {
+                await getToken(authCode);
+            }
         }
+
+        handleAuthorizationResponse(); // Check for authorization code on page load
     </script>
 </body>
 </html>
