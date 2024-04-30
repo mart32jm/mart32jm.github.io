@@ -69,8 +69,10 @@
             }
         }
 
-        // Call function to display user profile once the page loads
-        displayUserProfile();
+        // Call function to display user profile only after authorization
+        if (window.location.search.includes('code=')) {
+            displayUserProfile();
+        }
     </script>
 </body>
 </html>
