@@ -1,337 +1,362 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spotify Authorization</title>
-    <link rel="stylesheet" href="../styles/style.css">
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spotify PKCE Demo</title>
+  <link rel="icon" href="https://fav.farm/🎵">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
+  <style>
+    input:invalid {
+      border: 2px solid red;
+    }
+
+    output {
+      background-color: lightgray;
+      font-family: 'Courier New', Courier, monospace;
+      word-break: break-all;
+    }
+
+    label {
+      font-weight: bold;
+    }
+
+    li {
+      margin-block-end: 1rem;
+    }
+  </style>
 </head>
+
 <body>
-    <h1>Spotify PKCE Demo</h1>
-    <p>"Client-side-only" Spotify api consumption. find source code here <a href="https://github.com/hcientist/Spotify-PKCE-Example">https://github.com/hcientist/Spotify-PKCE-Example</a></p>
-    <details open id="get-code">
-      <summary>
-        <h2>1. Getting an authorization code and access token</h2>
-      </summary>
-      <ol>
-        <li class="get-code">Register an app with spotify and give this page's URL (or something else if you have a reason
-          and understand what's happening) as both the <code>website</code> and
-          <code>redirect uri</code>. Once you register, Spotify will give you a <code>Client Id</code>. We need that (as
-          well as the <code>redirect uri</code>)in the next step.
-        </li>
-        <li class="get-code">Put your app's:
-          <ul>
-            <li><code>Client Id</code> here: <input required type="password" name="client-id" id="client-id" autofocus>
-            </li>
-            <li><code>redirect uri</code> here: <input required type="text" name="redirect-uri" id="redirect-uri"></li>
-          </ul>
-        </li>
-        <li class="get-code">Get auth(orization) code: <button type="button" id="begin">Get Spotify Auth Code</button>
-        </li>
-      </ol>
-    </details>
-    <details id="get-token" open>
-      <summary>
-        <h2>2. Have auth code, get (access)Token</h2>
-        <label for="code-output">auth code:</label> <output id="code-output" name="code-output"></output>
-      </summary>
-      <ol>
-        <li><button type="button" id="token">Get Token</button></li>
-      </ol>
-    </details>
-  
-    <label for="token-output">(access) token:</label> <output id="token-output" name="token-output"></output>
-  
-    <h2>Have token, make api request(s)</h2>
-    <ul>
-      <li><button type="button" id="profile">Get my profile</button></li>
-      <li>Search for items on Spotify<br><label for="query">Search query:</label><input size="32" type="text" name="query"
-          id="query"><button type="button" id="search-button">Search</button></li>
-      <li>Play items in the active spotify player for this user's account (something should be playing or recently played
-        in spotify for this account. on the computer, mobile or really anywhere should work fine.)
-        <label for="uris">space-separated list of spotify uris</label>
-        <textarea name="uris" id="uris" cols="36"
-          placeholder="spotify:track:39rHfrVqCX6A55GF7uOZSC spotify:track:0grFc6klR3hxoHLcgCYsF4"></textarea>
-        <button type="button" id="play-button">▶️</button>
+  <h1>Spotify PKCE Demo</h1>
+  <p>"Client-side-only" Spotify api consumption. find source code here <a href="https://github.com/hcientist/Spotify-PKCE-Example">https://github.com/hcientist/Spotify-PKCE-Example</a></p>
+  <details open id="get-code">
+    <summary>
+      <h2>1. Getting an authorization code and access token</h2>
+    </summary>
+    <ol>
+      <li class="get-code">Register an app with spotify and give this page's URL (or something else if you have a reason
+        and understand what's happening) as both the <code>website</code> and
+        <code>redirect uri</code>. Once you register, Spotify will give you a <code>Client Id</code>. We need that (as
+        well as the <code>redirect uri</code>)in the next step.
       </li>
-    </ul>
-    <output id="api-output"></output>
-  
-    <script>
-      //get refs to dom elements
-      const authCodeOutputElem = document.getElementById('code-output')
-      const clientIDElem = document.getElementById('client-id')
-      const redirectURIElem = document.getElementById('redirect-uri')
-      const getCodeBtn = document.getElementById('begin')
-      const getTokenBtn = document.getElementById('token')
-      const tokenOutputElem = document.getElementById('token-output')
-      const getProfileBtn = document.getElementById('profile')
-      const searchBtn = document.getElementById('search-button')
-      const queryInputElem = document.getElementById('query')
-      const playBtn = document.getElementById('play-button')
-      const urisInputElem = document.getElementById('uris')
-      // const inputElems = document.querySelectorAll('input')
-      const getCodeDetails = document.getElementById('get-code')
-      const getTokenDetails = document.getElementById('get-token')
-      const apiOutputElem = document.getElementById('api-output')
-  
-      let codeVerifier = generateRandomString(128);
-  
-      let clientId = localStorage.getItem('clientId')
-      if (clientId) {
-        clientIDElem.value = clientId
-      }
-  
-      let redirectUri = localStorage.getItem('redirectUri')
-      if (redirectUri) {
-        redirectURIElem.value = redirectUri
-      } else {
-        redirectURIElem.value = window.location
-      }
-  
-      // see if the url has the code in it (in some browsers they annoyingly hide
-      // the nerdly bits of the url by default, you may have to click in the address bar to see it yourself)
-      const urlParams = new URLSearchParams(window.location.search);
-      let code = urlParams.get('code');
-  
-  
-      // do we already have the access token? auth code?
-      let token = localStorage.getItem('access_token')
-      if (token) {
-        tokenOutputElem.value = token
-        if (code) {
-          // if it does have the code, paste it into the corresponding output elem
-          // do this in the root of the script so that it happens on load.
-          // we expect this to be added to the url after the user permits/rejects our
-          // app from accessing their spotify information (which they will do on
-          // spotify's page, not ours)
-          // in this case, disable? no maybe just de-emphasize the get-code and get-token controls
-  
-          console.log('got code! 🙌', code)
-          authCodeOutputElem.value = code
-        }
-        getCodeDetails.removeAttribute("open")
-        getTokenDetails.removeAttribute("open")
-      } else if (code) {
+      <li class="get-code">Put your app's:
+        <ul>
+          <li><code>Client Id</code> here: <input required type="password" name="client-id" id="client-id" autofocus>
+          </li>
+          <li><code>redirect uri</code> here: <input required type="text" name="redirect-uri" id="redirect-uri"></li>
+        </ul>
+      </li>
+      <li class="get-code">Get auth(orization) code: <button type="button" id="begin">Get Spotify Auth Code</button>
+      </li>
+    </ol>
+  </details>
+  <details id="get-token" open>
+    <summary>
+      <h2>2. Have auth code, get (access)Token</h2>
+      <label for="code-output">auth code:</label> <output id="code-output" name="code-output"></output>
+    </summary>
+    <ol>
+      <li><button type="button" id="token">Get Token</button></li>
+    </ol>
+  </details>
+
+  <label for="token-output">(access) token:</label> <output id="token-output" name="token-output"></output>
+
+  <h2>Have token, make api request(s)</h2>
+  <ul>
+    <li><button type="button" id="profile">Get my profile</button></li>
+    <li>Search for items on Spotify<br><label for="query">Search query:</label><input size="32" type="text" name="query"
+        id="query"><button type="button" id="search-button">Search</button></li>
+    <li>Play items in the active spotify player for this user's account (something should be playing or recently played
+      in spotify for this account. on the computer, mobile or really anywhere should work fine.)
+      <label for="uris">space-separated list of spotify uris</label>
+      <textarea name="uris" id="uris" cols="36"
+        placeholder="spotify:track:39rHfrVqCX6A55GF7uOZSC spotify:track:0grFc6klR3hxoHLcgCYsF4"></textarea>
+      <button type="button" id="play-button">▶️</button>
+    </li>
+  </ul>
+  <output id="api-output"></output>
+
+  <script>
+    //get refs to dom elements
+    const authCodeOutputElem = document.getElementById('code-output')
+    const clientIDElem = document.getElementById('client-id')
+    const redirectURIElem = document.getElementById('redirect-uri')
+    const getCodeBtn = document.getElementById('begin')
+    const getTokenBtn = document.getElementById('token')
+    const tokenOutputElem = document.getElementById('token-output')
+    const getProfileBtn = document.getElementById('profile')
+    const searchBtn = document.getElementById('search-button')
+    const queryInputElem = document.getElementById('query')
+    const playBtn = document.getElementById('play-button')
+    const urisInputElem = document.getElementById('uris')
+    // const inputElems = document.querySelectorAll('input')
+    const getCodeDetails = document.getElementById('get-code')
+    const getTokenDetails = document.getElementById('get-token')
+    const apiOutputElem = document.getElementById('api-output')
+
+    let codeVerifier = generateRandomString(128);
+
+    let clientId = localStorage.getItem('clientId')
+    if (clientId) {
+      clientIDElem.value = clientId
+    }
+
+    let redirectUri = localStorage.getItem('redirectUri')
+    if (redirectUri) {
+      redirectURIElem.value = redirectUri
+    } else {
+      redirectURIElem.value = window.location
+    }
+
+    // see if the url has the code in it (in some browsers they annoyingly hide
+    // the nerdly bits of the url by default, you may have to click in the address bar to see it yourself)
+    const urlParams = new URLSearchParams(window.location.search);
+    let code = urlParams.get('code');
+
+
+    // do we already have the access token? auth code?
+    let token = localStorage.getItem('access_token')
+    if (token) {
+      tokenOutputElem.value = token
+      if (code) {
         // if it does have the code, paste it into the corresponding output elem
         // do this in the root of the script so that it happens on load.
         // we expect this to be added to the url after the user permits/rejects our
         // app from accessing their spotify information (which they will do on
         // spotify's page, not ours)
         // in this case, disable? no maybe just de-emphasize the get-code and get-token controls
-  
+
         console.log('got code! 🙌', code)
         authCodeOutputElem.value = code
-        getCodeDetails.removeAttribute("open")
       }
-  
-      // if click getCode, try to get it
-      getCodeBtn.addEventListener('click', () => {
-        if (clientIDElem.value) {
-          clientId = clientIDElem.value;
-          localStorage.setItem('clientId', clientId)
-        }
-        if (redirectURIElem.value) {
-          redirectUri = redirectURIElem.value;
-          localStorage.setItem('redirectUri', redirectUri)
-        }
-        if (clientId && redirectUri) {
-          getAuthCode(clientId, redirectUri)
-        }
-      })
-  
-      // if click getToken
-      getTokenBtn.addEventListener('click', () => {
-        console.log('clicccccked')
-        if (clientIDElem.value) {
-          clientId = clientIDElem.value;
-        }
-        if (redirectURIElem.value) {
-          redirectUri = redirectURIElem.value;
-        }
-        console.log('gettoken', clientId, redirectUri, code)
-        if (clientId && redirectUri && code) {
-          getToken(clientId, redirectUri, code)
-            .then(t => {
-              token = t
-              tokenOutputElem.value = t
-            })
-        }
-      })
-  
-      getProfileBtn.addEventListener('click', () => {
-        if (token) {
-          getProfile(token)
-            .then(profile => appendAPIOutput(profile))
-        } else {
-          console.error("don't have token")
-        }
-      })
-  
-      searchBtn.addEventListener('click', () => {
-        if (token && queryInputElem.value) {
-          searchSpotify(token, queryInputElem.value)
-            .then(results => appendAPIOutput(results))
-        }
-      })
-  
-      playBtn.addEventListener('click', () => {
-        if (token) {
-          playItem(token, urisInputElem.value)
-            // playItem(token)
-            .then(results => appendAPIOutput(results))
-        }
-      })
-  
-      function appendAPIOutput(newVal) {
-        apiOutputElem.value = '\n\n' + new Date().toLocaleTimeString() + '\n' + JSON.stringify(newVal) + apiOutputElem.value
+      getCodeDetails.removeAttribute("open")
+      getTokenDetails.removeAttribute("open")
+    } else if (code) {
+      // if it does have the code, paste it into the corresponding output elem
+      // do this in the root of the script so that it happens on load.
+      // we expect this to be added to the url after the user permits/rejects our
+      // app from accessing their spotify information (which they will do on
+      // spotify's page, not ours)
+      // in this case, disable? no maybe just de-emphasize the get-code and get-token controls
+
+      console.log('got code! 🙌', code)
+      authCodeOutputElem.value = code
+      getCodeDetails.removeAttribute("open")
+    }
+
+    // if click getCode, try to get it
+    getCodeBtn.addEventListener('click', () => {
+      if (clientIDElem.value) {
+        clientId = clientIDElem.value;
+        localStorage.setItem('clientId', clientId)
       }
-  
-      // a bunch of functions from the spotify example that we'll need
-      // code verifier 
-      function generateRandomString(length) {
-        let text = '';
-        let possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  
-        for (let i = 0; i < length; i++) {
-          text += possible.charAt(Math.floor(Math.random() * possible.length));
-        }
-        return text;
+      if (redirectURIElem.value) {
+        redirectUri = redirectURIElem.value;
+        localStorage.setItem('redirectUri', redirectUri)
       }
-  
-      // Code Challenge
-      function generateCodeChallenge(codeVerifier) {
-        function base64encode(string) {
-          return btoa(String.fromCharCode.apply(null, new Uint8Array(string)))
-            .replace(/\+/g, '-')
-            .replace(/\//g, '_')
-            .replace(/=+$/, '');
-        }
-  
-        const encoder = new TextEncoder();
-        const data = encoder.encode(codeVerifier);
-        const digest = window.crypto.subtle.digest('SHA-256', data);
-  
-        return digest.then(d => base64encode(d));
+      if (clientId && redirectUri) {
+        getAuthCode(clientId, redirectUri)
       }
-  
-      // send user to spotify to permit/deny our app access, success will result
-      // in an authorization code
-      function getAuthCode(clientId, redirectUri) {
-        return generateCodeChallenge(codeVerifier)
-          .then(codeChallenge => {
-            localStorage.setItem('code_verifier', codeVerifier);
-  
-            let state = generateRandomString(16);
-  
-            // NOTE: depending on which spotify API endpoints you wish to access,
-            // you may require different "scopes". The scopes are the way Spotify
-            // informs the user about what things your app would like permission
-            // to do on their behalf in Spotify. 
-            // see the list of scopes in the docs: 
-            // https://developer.spotify.com/documentation/web-api/concepts/scopes#list-of-scopes
-            let scope = 'user-read-private user-read-email user-modify-playback-state';
-  
-  
-            let args = new URLSearchParams({
-              response_type: 'code',
-              client_id: clientId,
-              scope: scope,
-              redirect_uri: redirectUri,
-              state: state,
-              code_challenge_method: 'S256',
-              code_challenge: codeChallenge
-            });
-  
-            window.location = 'https://accounts.spotify.com/authorize?' + args;
+    })
+
+    // if click getToken
+    getTokenBtn.addEventListener('click', () => {
+      console.log('clicccccked')
+      if (clientIDElem.value) {
+        clientId = clientIDElem.value;
+      }
+      if (redirectURIElem.value) {
+        redirectUri = redirectURIElem.value;
+      }
+      console.log('gettoken', clientId, redirectUri, code)
+      if (clientId && redirectUri && code) {
+        getToken(clientId, redirectUri, code)
+          .then(t => {
+            token = t
+            tokenOutputElem.value = t
+          })
+      }
+    })
+
+    getProfileBtn.addEventListener('click', () => {
+      if (token) {
+        getProfile(token)
+          .then(profile => appendAPIOutput(profile))
+      } else {
+        console.error("don't have token")
+      }
+    })
+
+    searchBtn.addEventListener('click', () => {
+      if (token && queryInputElem.value) {
+        searchSpotify(token, queryInputElem.value)
+          .then(results => appendAPIOutput(results))
+      }
+    })
+
+    playBtn.addEventListener('click', () => {
+      if (token) {
+        playItem(token, urisInputElem.value)
+          // playItem(token)
+          .then(results => appendAPIOutput(results))
+      }
+    })
+
+    function appendAPIOutput(newVal) {
+      apiOutputElem.value = '\n\n' + new Date().toLocaleTimeString() + '\n' + JSON.stringify(newVal) + apiOutputElem.value
+    }
+
+    // a bunch of functions from the spotify example that we'll need
+    // code verifier 
+    function generateRandomString(length) {
+      let text = '';
+      let possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+
+      for (let i = 0; i < length; i++) {
+        text += possible.charAt(Math.floor(Math.random() * possible.length));
+      }
+      return text;
+    }
+
+    // Code Challenge
+    function generateCodeChallenge(codeVerifier) {
+      function base64encode(string) {
+        return btoa(String.fromCharCode.apply(null, new Uint8Array(string)))
+          .replace(/\+/g, '-')
+          .replace(/\//g, '_')
+          .replace(/=+$/, '');
+      }
+
+      const encoder = new TextEncoder();
+      const data = encoder.encode(codeVerifier);
+      const digest = window.crypto.subtle.digest('SHA-256', data);
+
+      return digest.then(d => base64encode(d));
+    }
+
+    // send user to spotify to permit/deny our app access, success will result
+    // in an authorization code
+    function getAuthCode(clientId, redirectUri) {
+      return generateCodeChallenge(codeVerifier)
+        .then(codeChallenge => {
+          localStorage.setItem('code_verifier', codeVerifier);
+
+          let state = generateRandomString(16);
+
+          // NOTE: depending on which spotify API endpoints you wish to access,
+          // you may require different "scopes". The scopes are the way Spotify
+          // informs the user about what things your app would like permission
+          // to do on their behalf in Spotify. 
+          // see the list of scopes in the docs: 
+          // https://developer.spotify.com/documentation/web-api/concepts/scopes#list-of-scopes
+          let scope = 'user-read-private user-read-email user-modify-playback-state';
+
+
+          let args = new URLSearchParams({
+            response_type: 'code',
+            client_id: clientId,
+            scope: scope,
+            redirect_uri: redirectUri,
+            state: state,
+            code_challenge_method: 'S256',
+            code_challenge: codeChallenge
           });
-      }
-  
-      // get the access token that we need to make requests to the spotify api endpoints
-      function getToken(clientId, redirectUri, code) {
-        if (!(clientId && redirectUri && code)) {
-          console.error('requires', clientId, redirectUri, code)
-        }
-        let codeVerifier = localStorage.getItem('code_verifier');
-  
-        let body = new URLSearchParams({
-          grant_type: 'authorization_code',
-          code: code,
-          redirect_uri: redirectUri,
-          client_id: clientId,
-          code_verifier: codeVerifier
+
+          window.location = 'https://accounts.spotify.com/authorize?' + args;
         });
-  
-        return fetch('https://accounts.spotify.com/api/token', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-          },
-          body: body
-        })
-          .then(response => {
-            if (!response.ok) {
-              throw new Error('HTTP status ' + response.status);
-            }
-            return response.json();
-          })
-          .then(data => {
-            localStorage.setItem('access_token', data.access_token);
-            return data.access_token;
-          })
-          .catch(error => {
-            console.error('Error:', error);
-          });
+    }
+
+    // get the access token that we need to make requests to the spotify api endpoints
+    function getToken(clientId, redirectUri, code) {
+      if (!(clientId && redirectUri && code)) {
+        console.error('requires', clientId, redirectUri, code)
       }
-  
-  
-      ////////// functions to use the Spotify API
-      // function to use the profile endpoint
-      function getProfile(accessToken) {
-        return fetch('https://api.spotify.com/v1/me', {
-          headers: {
-            Authorization: 'Bearer ' + accessToken
+      let codeVerifier = localStorage.getItem('code_verifier');
+
+      let body = new URLSearchParams({
+        grant_type: 'authorization_code',
+        code: code,
+        redirect_uri: redirectUri,
+        client_id: clientId,
+        code_verifier: codeVerifier
+      });
+
+      return fetch('https://accounts.spotify.com/api/token', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: body
+      })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('HTTP status ' + response.status);
           }
-        }).then(r => r.json()).then(data => {
-          console.log(data)
-          return data;
+          return response.json();
         })
-      }
-  
-      // function to search for spotify results
-      function searchSpotify(accessToken, query) {
-        return fetch(`https://api.spotify.com/v1/search?q=${query}&type=album%2Cplaylist%2Cartist%2Ctrack`, {
-          headers: {
-            Authorization: 'Bearer ' + accessToken
-          }
-        }).then(r => r.json()).then(data => {
-          console.log(data)
-          return data;
+        .then(data => {
+          localStorage.setItem('access_token', data.access_token);
+          return data.access_token;
         })
-      }
-  
-      // function to search for spotify results
-      function playItem(accessToken, uriString = "spotify:track:39rHfrVqCX6A55GF7uOZSC") {
-        const uris = uriString.trim().split(' ')
-        const body = {
-          uris
-          // "position_ms": 0
+        .catch(error => {
+          console.error('Error:', error);
+        });
+    }
+
+
+    ////////// functions to use the Spotify API
+    // function to use the profile endpoint
+    function getProfile(accessToken) {
+      return fetch('https://api.spotify.com/v1/me', {
+        headers: {
+          Authorization: 'Bearer ' + accessToken
         }
-        return fetch(`https://api.spotify.com/v1/me/player/play`, {
-          method: 'PUT',
-          headers: {
-            Authorization: 'Bearer ' + accessToken,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(body)
-        }).then(r => {
-          console.log('success code back from play!')
-          return {
-            responseStatus: r.status,
-            message: "the play endpoint doesn't respond with data, just status code"
-          }
-        })
+      }).then(r => r.json()).then(data => {
+        console.log(data)
+        return data;
+      })
+    }
+
+    // function to search for spotify results
+    function searchSpotify(accessToken, query) {
+      return fetch(`https://api.spotify.com/v1/search?q=${query}&type=album%2Cplaylist%2Cartist%2Ctrack`, {
+        headers: {
+          Authorization: 'Bearer ' + accessToken
+        }
+      }).then(r => r.json()).then(data => {
+        console.log(data)
+        return data;
+      })
+    }
+
+    // function to search for spotify results
+    function playItem(accessToken, uriString = "spotify:track:39rHfrVqCX6A55GF7uOZSC") {
+      const uris = uriString.trim().split(' ')
+      const body = {
+        uris
+        // "position_ms": 0
       }
-    </script>
-  </body>
+      return fetch(`https://api.spotify.com/v1/me/player/play`, {
+        method: 'PUT',
+        headers: {
+          Authorization: 'Bearer ' + accessToken,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(body)
+      }).then(r => {
+        console.log('success code back from play!')
+        return {
+          responseStatus: r.status,
+          message: "the play endpoint doesn't respond with data, just status code"
+        }
+      })
+    }
+  </script>
+</body>
+
 </html>
