@@ -44,11 +44,6 @@
         well as the <code>redirect uri</code>)in the next step.
       </li>
       <li class="get-code">Put your app's:
-        <ul>
-          <li>
-          </li>
-          <li><code>redirect uri</code> here: <input required type="text" name="redirect-uri" id="redirect-uri"></li>
-        </ul>
       </li>
       <li class="get-code">Get auth(orization) code: <button type="button" id="begin">Get Spotify Auth Code</button>
       </li>
@@ -85,7 +80,7 @@
     //get refs to dom elements
     const authCodeOutputElem = document.getElementById('code-output')
     const clientIDElem = 'bca2a89f33694250b5b79633e3435a39'
-    const redirectURIElem = document.getElementById('redirect-uri')
+    const redirectURIElem = 'https://mart32jm.github.io/design/login.html'
     const getCodeBtn = document.getElementById('begin')
     const getTokenBtn = document.getElementById('token')
     const tokenOutputElem = document.getElementById('token-output')
