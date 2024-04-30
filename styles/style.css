@@ -33,6 +33,7 @@ nav a:hover {
 
 /* Styles specific to big screens (min-width: 768px) */
 @media screen and (min-width: 768px) {
+    /* Add your styles for big screens here */
     nav {
         padding: 20px 40px;
     }
@@ -44,13 +45,37 @@ nav a:hover {
 
 /* Styles specific to small screens (max-width: 767px) */
 @media screen and (max-width: 767px) {
+    /* Add your styles for small screens here */
     nav {
         flex-direction: column;
         align-items: flex-start;
     }
 
-    nav a {
+    .dropdown-menu {
+        display: none; /* Hide dropdown menu by default */
+    }
+
+    .dropdown-toggle {
         display: block;
-        padding: 15px 20px;
+        background-color: #000;
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        cursor: pointer;
+        margin-bottom: 10px;
+    }
+
+    .dropdown-toggle:hover {
+        background-color: #fff;
+        color: #000;
+    }
+
+    .dropdown-toggle::after {
+        content: '\25BC'; /* Unicode triangle icon for dropdown */
+        margin-left: 5px;
+    }
+
+    .show-dropdown .dropdown-menu {
+        display: block; /* Show dropdown menu when .show-dropdown is applied */
     }
 }

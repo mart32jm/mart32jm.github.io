@@ -7,41 +7,70 @@
     <link rel="stylesheet" href="../styles/style.css">
 </head>
 <body>
-    <h1>Authorize Your Spotify Account</h1>
-    <button id="authorizeButton">Authorize</button>
+    <h1>Spotify Profile</h1>
+    <button id="authorizeButton">Authorize with Spotify</button>
+    <div id="profileInfo">
+        <h2>User Profile</h2>
+        <p id="userName">Username: </p>
+        <img src="" alt="Profile Image" id="profileImage">
+    </div>
 
     <script>
-        document.getElementById('authorizeButton').addEventListener('click', function() {
-            var clientId = 'bca2a89f33694250b5b79633e3435a39';
-            var redirectUri = window.location.origin + '/callback'; // Your callback URL
+        document.getElementById('authorizeButton').addEventListener('click', async function() {
+            const clientId = 'bca2a89f33694250b5b79633e3435a39';
+            const redirectUri = 'https://wanghci.github.io/spotify-api-tutorial/';
+            const scope = 'user-read-private user-read-email';
 
-            var queryParams = {
-                client_id: clientId,
-                response_type: 'code',
-                redirect_uri: redirectUri,
-                scope: 'user-read-private user-read-email' // Add the necessary scopes
-            };
-
-            const params =  {
+            // Construct the authorization URL
+            const authUrl = new URL("https://accounts.spotify.com/authorize");
+            const params = {
                 response_type: 'code',
                 client_id: clientId,
                 scope: scope,
-                code_challenge_method: 'S256',
-                code_challenge: codeChallenge, // The hashed code verifier
                 redirect_uri: redirectUri,
+            };
+            authUrl.search = new URLSearchParams(params).toString();
+
+            // Redirect the user to the authorization URL
+            window.location.href = authUrl.toString();
+        });
+
+        // Function to extract access token from URL
+        function getAccessTokenFromUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('code');
+        }
+
+        // Function to fetch user profile using access token
+        async function fetchUserProfile(accessToken) {
+            const response = await fetch("https://api.spotify.com/v1/me", {
+                headers: {
+                    'Authorization': 'Bearer ' + accessToken,
+                },
+            });
+            const data = await response.json();
+            return data;
+        }
+
+        // Function to display user profile information
+        async function displayUserProfile() {
+            const accessToken = getAccessTokenFromUrl();
+            if (!accessToken) {
+                alert('Access token not found.');
+                return;
             }
 
-            authUrl.search = new URLSearchParams(params).toString();
-            window.location.href = authUrl.toString(); // Redirect the user
+            try {
+                const userProfile = await fetchUserProfile(accessToken);
+                document.getElementById('userName').textContent = 'Username: ' + userProfile.display_name;
+                document.getElementById('profileImage').src = userProfile.images[0].url;
+            } catch (error) {
+                console.error('Error fetching user profile:', error);
+            }
+        }
 
-            var queryString = Object.keys(queryParams)
-                .map(key => key + '=' + encodeURIComponent(queryParams[key]))
-                .join('&');
-
-            var authUrl = 'https://accounts.spotify.com/authorize?' + queryString;
-
-            window.location.href = authUrl;
-        });
+        // Call function to display user profile once the page loads
+        displayUserProfile();
     </script>
 </body>
 </html>
