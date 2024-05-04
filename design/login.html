@@ -35,6 +35,9 @@
 
 <output id="api-output"></output>
 
+<img id="profile-image" src="" alt="Profile Image">
+<h2 id="profile-name"></h2>
+
 <script>
     document.getElementById('authorize').addEventListener('click', () => {
         // Get client ID and redirect URI
@@ -64,22 +67,26 @@
     // After authorization and token grabbing, automatically fetch and display user's profile
     const token = localStorage.getItem('access_token');
     if (token) {
-        getProfile(token);
+        getUserProfile(token)
+            .then((profile) => {
+                document.getElementById("profile-image").src = profile.images[profile.images.length - 1].url;
+                document.getElementById("profile-name").textContent = profile.display_name;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
     }
 
-    async function getProfile(accessToken) {
-        try {
-            const response = await fetch("https://api.spotify.com/v1/me", {
-                headers: {
-                    'Authorization': 'Bearer ' + accessToken,
-                },
-            });
-            const data = await response.json();
-            console.log(data);
-            document.getElementById('api-output').value = JSON.stringify(data, null, 2);
-        } catch (error) {
-            console.error('Error:', error);
+    async function getUserProfile(accessToken) {
+        const response = await fetch("https://api.spotify.com/v1/me", {
+            headers: {
+                'Authorization': 'Bearer ' + accessToken,
+            },
+        });
+        if (!response.ok) {
+            throw new Error('HTTP status ' + response.status);
         }
+        return await response.json();
     }
 
     function generateRandomString(length) {
