@@ -33,8 +33,6 @@
 <p>"Client-side-only" Spotify api consumption. find source code here <a href="https://github.com/hcientist/Spotify-PKCE-Example">https://github.com/hcientist/Spotify-PKCE-Example</a></p>
 <button type="button" id="authorize">Authorize</button>
 
-<button type="button" id="get-profile" style="display: none;">Get Profile</button>
-
 <output id="api-output"></output>
 
 <script>
@@ -63,16 +61,26 @@
             });
     });
 
-    document.getElementById('get-profile').addEventListener('click', () => {
-        const token = localStorage.getItem('access_token');
-        if (!token) {
-            console.error('No access token found.');
-            return;
-        }
+    // After authorization and token grabbing, automatically fetch and display user's profile
+    const token = localStorage.getItem('access_token');
+    if (token) {
         getProfile(token);
-    });
+    }
 
-    // Other functions and event listeners remain the same as in your original code
+    async function getProfile(accessToken) {
+        try {
+            const response = await fetch("https://api.spotify.com/v1/me", {
+                headers: {
+                    'Authorization': 'Bearer ' + accessToken,
+                },
+            });
+            const data = await response.json();
+            console.log(data);
+            document.getElementById('api-output').value = JSON.stringify(data, null, 2);
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
 
     function generateRandomString(length) {
         let text = '';
@@ -97,26 +105,6 @@
 
         return digest.then(d => base64encode(d));
     }
-
-    function getProfile(accessToken) {
-        fetch('https://api.spotify.com/v1/me', {
-            headers: {
-                Authorization: 'Bearer ' + accessToken
-            }
-        }).then(response => {
-            if (!response.ok) {
-                throw new Error('HTTP status ' + response.status);
-            }
-            return response.json();
-        }).then(profile => {
-            console.log(profile);
-            document.getElementById('api-output').value = JSON.stringify(profile, null, 2);
-        }).catch(error => {
-            console.error('Error:', error);
-        });
-    }
-
-    // Other functions remain the same as in your original code
 
 </script>
 </body>
