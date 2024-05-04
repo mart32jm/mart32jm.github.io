@@ -96,7 +96,17 @@
         getToken('bca2a89f33694250b5b79633e3435a39', 'https://mart32jm.github.io/design/login.html', code)
             .then(token => {
                 document.getElementById('token-output').value = token;
+                getProfile(token);
             });
+    });
+
+    document.getElementById('profile').addEventListener('click', () => {
+        const token = localStorage.getItem('access_token');
+        if (!token) {
+            console.error('No access token found.');
+            return;
+        }
+        getProfile(token);
     });
 
     // Other functions and event listeners remain the same as in your original code
@@ -156,6 +166,24 @@
             .catch(error => {
                 console.error('Error:', error);
             });
+    }
+
+    function getProfile(accessToken) {
+        fetch('https://api.spotify.com/v1/me', {
+            headers: {
+                Authorization: 'Bearer ' + accessToken
+            }
+        }).then(response => {
+            if (!response.ok) {
+                throw new Error('HTTP status ' + response.status);
+            }
+            return response.json();
+        }).then(profile => {
+            console.log(profile);
+            document.getElementById('api-output').value = JSON.stringify(profile, null, 2);
+        }).catch(error => {
+            console.error('Error:', error);
+        });
     }
 
     // Other functions remain the same as in your original code
