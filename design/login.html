@@ -33,10 +33,12 @@
 <p>"Client-side-only" Spotify api consumption. find source code here <a href="https://github.com/hcientist/Spotify-PKCE-Example">https://github.com/hcientist/Spotify-PKCE-Example</a></p>
 <button type="button" id="authorize">Authorize</button>
 
-<output id="api-output"></output>
+<div id="profile-info" style="display: none;">
+    <img id="profile-image" src="" alt="Profile Image">
+    <h2 id="profile-name"></h2>
+</div>
 
-<img id="profile-image" src="" alt="Profile Image">
-<h2 id="profile-name"></h2>
+<output id="api-output"></output>
 
 <script>
     document.getElementById('authorize').addEventListener('click', () => {
@@ -69,8 +71,9 @@
     if (token) {
         getUserProfile(token)
             .then((profile) => {
-                document.getElementById("profile-image").src = profile.images[profile.images.length - 1].url;
-                document.getElementById("profile-name").textContent = profile.display_name;
+                document.getElementById('profile-image').src = profile.images[profile.images.length - 1].url;
+                document.getElementById('profile-name').textContent = profile.display_name;
+                document.getElementById('profile-info').style.display = 'block';
             })
             .catch((error) => {
                 console.error('Error:', error);
