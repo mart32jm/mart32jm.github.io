@@ -33,32 +33,8 @@
 <p>"Client-side-only" Spotify api consumption. find source code here <a href="https://github.com/hcientist/Spotify-PKCE-Example">https://github.com/hcientist/Spotify-PKCE-Example</a></p>
 <button type="button" id="authorize">Authorize</button>
 
-<details id="get-token" style="display:none;">
-    <summary>
-        <h2>Getting (access)Token</h2>
-    </summary>
-    <ol>
-        <li><button type="button" id="token">Get Token</button></li>
-    </ol>
-</details>
+<button type="button" id="get-profile" style="display: none;">Get Profile</button>
 
-<label for="token-output">(access) token:</label> <output id="token-output" name="token-output"></output>
-
-<h2>Have token, make api request(s)</h2>
-<ul>
-    <li><button type="button" id="profile">Get my profile</button></li>
-    <li>Search for items on Spotify<br><label for="query">Search query:</label><input size="32" type="text" name="query"
-                                                                                     id="query"><button type="button"
-                                                                                                         id="search-button">Search</button>
-    </li>
-    <li>Play items in the active spotify player for this user's account (something should be playing or recently played
-        in spotify for this account. on the computer, mobile or really anywhere should work fine.)
-        <label for="uris">space-separated list of spotify uris</label>
-        <textarea name="uris" id="uris" cols="36"
-                  placeholder="spotify:track:39rHfrVqCX6A55GF7uOZSC spotify:track:0grFc6klR3hxoHLcgCYsF4"></textarea>
-        <button type="button" id="play-button">▶️</button>
-    </li>
-</ul>
 <output id="api-output"></output>
 
 <script>
@@ -87,20 +63,7 @@
             });
     });
 
-    document.getElementById('token').addEventListener('click', () => {
-        const code = new URLSearchParams(window.location.search).get('code');
-        if (!code) {
-            console.error('No authorization code found.');
-            return;
-        }
-        getToken('bca2a89f33694250b5b79633e3435a39', 'https://mart32jm.github.io/design/login.html', code)
-            .then(token => {
-                document.getElementById('token-output').value = token;
-                getProfile(token);
-            });
-    });
-
-    document.getElementById('profile').addEventListener('click', () => {
+    document.getElementById('get-profile').addEventListener('click', () => {
         const token = localStorage.getItem('access_token');
         if (!token) {
             console.error('No access token found.');
@@ -133,39 +96,6 @@
         const digest = window.crypto.subtle.digest('SHA-256', data);
 
         return digest.then(d => base64encode(d));
-    }
-
-    function getToken(clientId, redirectUri, code) {
-        const codeVerifier = localStorage.getItem('code_verifier');
-        const body = new URLSearchParams({
-            grant_type: 'authorization_code',
-            code: code,
-            redirect_uri: redirectUri,
-            client_id: clientId,
-            code_verifier: codeVerifier
-        });
-
-        return fetch('https://accounts.spotify.com/api/token', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            body: body
-        })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('HTTP status ' + response.status);
-                }
-                return response.json();
-            })
-            .then(data => {
-                localStorage.setItem('access_token', data.access_token);
-                document.getElementById('get-token').style.display = 'none';
-                return data.access_token;
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
     }
 
     function getProfile(accessToken) {
