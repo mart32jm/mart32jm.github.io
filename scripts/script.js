@@ -268,7 +268,7 @@ document.getElementById("login-button").addEventListener("click", () => {
         return;
     }
 
-    requestAuthCode(clientId, redirectUri, codeChallenge);
+    requestAuthCode('bca2a89f33694250b5b79633e3435a39', redirectUri, codeChallenge);
 });
 
 document.getElementById("token-button").addEventListener("click", () => {
