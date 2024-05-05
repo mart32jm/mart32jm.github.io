@@ -77,6 +77,26 @@
 
         </section>
         <section class="card">
+            <h2 id="making-requests-to-the-spotify-api">4. Making Requests to the Spotify API</h2>
+            <p>Now that you have an access token, you can make requests to the <a href="https://developer.spotify.com/documentation/web-api">Spotify Web API</a>. For this tutorial, we will get the current user's profile and display their name and profile image. You can read the documentation for this endpoint <a href="https://developer.spotify.com/documentation/web-api/reference/get-current-users-profile">here</a>.</p>
+
+            <p>The base URL for the Spotify API is <code>https://api.spotify.com/v1</code>, and this specific endpoint has the path <code>/me</code>. Thus, the full URL is <code>https://api.spotify.com/v1/me</code>. You can read more about Spotify API calls <a href="https://developer.spotify.com/documentation/web-api/concepts/api-calls">here</a>.</p>
+            <p>To send a request to this (or any other) API endpoint, we can use <code>fetch()</code> with the full URL, and additionally specify any parameters the endpoint is expecting. All your requests must include the <a href="https://developer.spotify.com/documentation/web-api/concepts/access-token">access token</a> in the <code>Authorization</code> header, with the value: <code>Bearer [YOUR_ACCESS_TOKEN_HERE]</code>.</p>
+
+            <h3 id="example-api-request">Example Request</h3>
+            <p>Here is an example of how you can get the current user's profile:</p>
+
+            <!-- HTML generated using hilite.me -->
+            <div class="code-display">
+                <pre style="margin: 0; line-height: 125%"><span style="color: #008000; font-weight: bold">const</span> response <span style="color: #666666">=</span> await fetch(<span style="color: #BA2121">&quot;https://api.spotify.com/v1/me&quot;</span>, {
+    headers<span style="color: #666666">:</span> {
+        <span style="color: #BA2121">&#39;Authorization&#39;</span><span style="color: #666666">:</span> <span style="color: #BA2121">&#39;Bearer &#39;</span> <span style="color: #666666">+</span> accessToken,
+    },
+});
+
+<span style="color: #008000; font-weight: bold">const</span> data <span style="color: #666666">=</span> await response.json();
+</pre>
+            </div>
 
             <h3 id="try-api">Try It Yourself!</h3>
             <p>If you've successfully obtained an access token, you can click this button to get the current user's profile:</p>
