@@ -18,11 +18,22 @@
     </header>
 
     <main>
-
         <section class="card">
+            <h2 id="registering-your-app-with-spotify">1. Registering Your App with Spotify</h2>
+            <p>Before you can start using the Spotify API, you need to register your app on the <a href="https://developer.spotify.com/dashboard">Spotify Developer Dashboard.</a></p>
+            <p>Once you've registered your app, you'll receive a <code>client_id</code> that you'll need to use to authenticate your app. (Don't worry about the <code>client_secret</code>, this is used for other authorization flows.)</p>
             <p>Paste your Client ID here: <input id="paste-client-id" data-sync="client_id" type="text" size="40" placeholder="Client ID"> <span class="note">(we won't steal it, promise!)</span></p>
 
+            <h3 id="redirect-uri">Redirect URI</h3>
+            <p>You will also need to register the <code>redirect_uri</code> for your app.</p>
+            <p>Basically, the user will click a link on your site that will redirect them to Spotify so that they can log in and authorize your app. Once they've done so, Spotify will send the user back to your site. The <code>redirect_uri</code> tells Spotify where they should send them. For security reasons, Spotify requires that the <code>redirect_uri</code> be an <a href="https://en.wikipedia.org/wiki/Uniform_Resource_Identifier">absolute URI</a> and that it be registered with your app.</p>
+            <p>Go to the <a href="https://developer.spotify.com/dashboard">Developer Dashboard</a> and add a redirect URI. You should use something like <code>http://localhost:8080/index.html</code> if you're running on a local server. Once your app is deployed, use the full URL of your deployed page. <span class="note">(Spotify treats localhost and 127.0.0.1 as different, so make sure you specify the right one - or both!)</span></p>
+        </section>
         <section class="card">
+            <h2 id="getting-an-authorization-code">2. Getting an Authorization Code</h2>
+            <p>The first thing your app needs to do is request authorization from a Spotify user. This will send the user to Spotify, have them log in, and then redirect back to your app with an <em>authorization code</em> in the query string of the URL.</p>
+
+            <p>You will need two things to request an auth code:</p>
             <ul>
                 <li>
                     <code>client_id</code>: <input id="login-client-id" data-sync="client_id" type="text" size="40" placeholder="Client ID">
@@ -32,10 +43,21 @@
                 </li>
             </ul>
 
+            <h3 id="making-the-request">Making the Request</h3>
+            <p></p>
+
+            <p>You will need code to generate a <code>code_challenge</code> and a <code>code_verifier</code>. Spotify provides source code to create these in its <a href="https://developer.spotify.com/documentation/web-api/tutorials/code-pkce-flow#code-verifier">developer documentation</a>. You should use their provided code in your own project.</p>
+
+            <p>Here are the values we've generated for this tutorial: <button id="generate-button" type="button" class="small">Regenerate</button></p>
+
             <ul>
                 <li><code>code_verifier</code>: <code id="code-verifier" class="graybg"></code></li>
                 <li><code>code_challenge</code>: <code id="code-challenge" class="graybg"></code></li>
             </ul>
+
+            <p>You should generate your own values programatically each time you make a new authorization request. You will need to store the <code>code_verifier</code> in <code>localStorage</code>, since the page will be reloaded after Spotify redirects the user. Read <a href="#code-verifier-and-code-challenge">the section below</a> to see why this is important!</p>
+
+            <p>Here is an example of making the authorization request via JavaScript (updated with your request values):</p>
 
             <!-- HTML generated using hilite.me -->
             <div class="code-display">
