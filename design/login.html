@@ -60,134 +60,164 @@
     </li>
 </ul>
 <output id="api-output"></output>
-
 <script>
-    document.getElementById('authorize').addEventListener('click', () => {
-        // Get client ID and redirect URI
-        const clientId = 'bca2a89f33694250b5b79633e3435a39';
-        const redirectUri = 'https://mart32jm.github.io/design/login.html';
-        // Generate a code verifier
-        const codeVerifier = generateRandomString(128);
-        // Generate code challenge
-        generateCodeChallenge(codeVerifier)
-            .then(codeChallenge => {
-                localStorage.setItem('code_verifier', codeVerifier);
-                const state = generateRandomString(16);
-                const scope = 'user-read-private user-read-email user-modify-playback-state';
-                const args = new URLSearchParams({
-                    response_type: 'code',
-                    client_id: clientId,
-                    scope: scope,
-                    redirect_uri: redirectUri,
-                    state: state,
-                    code_challenge_method: 'S256',
-                    code_challenge: codeChallenge
-                });
-                window.location = 'https://accounts.spotify.com/authorize?' + args;
-            });
-    });
+  document.getElementById('authorize').addEventListener('click', () => {
+      // Get client ID and redirect URI
+      const clientId = 'bca2a89f33694250b5b79633e3435a39';
+      const redirectUri = 'https://mart32jm.github.io/design/login.html';
+      // Generate a code verifier
+      const codeVerifier = generateRandomString(128);
+      // Generate code challenge
+      generateCodeChallenge(codeVerifier)
+          .then(codeChallenge => {
+              localStorage.setItem('code_verifier', codeVerifier);
+              const state = generateRandomString(16);
+              const scope = 'user-read-private user-read-email user-modify-playback-state';
+              const args = new URLSearchParams({
+                  response_type: 'code',
+                  client_id: clientId,
+                  scope: scope,
+                  redirect_uri: redirectUri,
+                  state: state,
+                  code_challenge_method: 'S256',
+                  code_challenge: codeChallenge
+              });
+              window.location = 'https://accounts.spotify.com/authorize?' + args;
+          });
+  });
 
-    document.getElementById('token').addEventListener('click', () => {
-        const code = new URLSearchParams(window.location.search).get('code');
-        if (!code) {
-            console.error('No authorization code found.');
-            return;
-        }
-        getToken('bca2a89f33694250b5b79633e3435a39', 'https://mart32jm.github.io/design/login.html', code)
-            .then(token => {
-                document.getElementById('token-output').value = token;
-                getProfile(token);
-            });
-    });
+  document.getElementById('token').addEventListener('click', () => {
+      const code = new URLSearchParams(window.location.search).get('code');
+      if (!code) {
+          console.error('No authorization code found.');
+          return;
+      }
+      getToken('bca2a89f33694250b5b79633e3435a39', 'https://mart32jm.github.io/design/login.html', code)
+          .then(token => {
+              document.getElementById('token-output').value = token;
+              getProfile(token);
+          });
+  });
 
-    document.getElementById('profile').addEventListener('click', () => {
-        const token = localStorage.getItem('access_token');
-        if (!token) {
-            console.error('No access token found.');
-            return;
-        }
-        getProfile(token);
-    });
+  document.getElementById('profile').addEventListener('click', () => {
+      const token = localStorage.getItem('access_token');
+      if (!token) {
+          console.error('No access token found.');
+          return;
+      }
+      getProfile(token);
+  });
 
-    // Other functions and event listeners remain the same as in your original code
+  // Refresh token if it's expired
+  const refreshTokenIfNeeded = () => {
+      const expirationTime = parseInt(localStorage.getItem('token_expires_at'));
+      const now = Date.now() / 1000; // Convert to seconds
 
-    function generateRandomString(length) {
-        let text = '';
-        const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-        for (let i = 0; i < length; i++) {
-            text += possible.charAt(Math.floor(Math.random() * possible.length));
-        }
-        return text;
-    }
+      if (expirationTime && now >= expirationTime) {
+          const refreshToken = localStorage.getItem('refresh_token');
+          if (refreshToken) {
+              refreshAccessToken('bca2a89f33694250b5b79633e3435a39', refreshToken)
+                  .then(data => {
+                      const accessToken = data.access_token;
+                      localStorage.setItem('access_token', accessToken);
+                      const newExpirationTime = now + data.expires_in;
+                      localStorage.setItem('token_expires_at', newExpirationTime);
+                      console.log('Token refreshed successfully!');
+                  })
+                  .catch(error => {
+                      console.error('Error refreshing token:', error);
+                  });
+          } else {
+              console.error('Refresh token not found.');
+          }
+      }
+  };
 
-    function generateCodeChallenge(codeVerifier) {
-        function base64encode(string) {
-            return btoa(String.fromCharCode.apply(null, new Uint8Array(string)))
-                .replace(/\+/g, '-')
-                .replace(/\//g, '_')
-                .replace(/=+$/, '');
-        }
+  refreshTokenIfNeeded();
 
-        const encoder = new TextEncoder();
-        const data = encoder.encode(codeVerifier);
-        const digest = window.crypto.subtle.digest('SHA-256', data);
+  // Other functions and event listeners remain the same as in your original code
 
-        return digest.then(d => base64encode(d));
-    }
+  function generateRandomString(length) {
+      let text = '';
+      const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+      for (let i = 0; i < length; i++) {
+          text += possible.charAt(Math.floor(Math.random() * possible.length));
+      }
+      return text;
+  }
 
-    function getToken(clientId, redirectUri, code) {
-        const codeVerifier = localStorage.getItem('code_verifier');
-        const body = new URLSearchParams({
-            grant_type: 'authorization_code',
-            code: code,
-            redirect_uri: redirectUri,
-            client_id: clientId,
-            code_verifier: codeVerifier
-        });
+  function generateCodeChallenge(codeVerifier) {
+      function base64encode(string) {
+          return btoa(String.fromCharCode.apply(null, new Uint8Array(string)))
+              .replace(/\+/g, '-')
+              .replace(/\//g, '_')
+              .replace(/=+$/, '');
+      }
 
-        return fetch('https://accounts.spotify.com/api/token', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            body: body
-        })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('HTTP status ' + response.status);
-                }
-                return response.json();
-            })
-            .then(data => {
-                localStorage.setItem('access_token', data.access_token);
-                document.getElementById('get-token').style.display = 'none';
-                return data.access_token;
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
-    }
+      const encoder = new TextEncoder();
+      const data = encoder.encode(codeVerifier);
+      const digest = window.crypto.subtle.digest('SHA-256', data);
 
-    function getProfile(accessToken) {
-        fetch('https://api.spotify.com/v1/me', {
-            headers: {
-                Authorization: 'Bearer ' + accessToken
-            }
-        }).then(response => {
-            if (!response.ok) {
-                throw new Error('HTTP status ' + response.status);
-            }
-            return response.json();
-        }).then(profile => {
-            console.log(profile);
-            document.getElementById('api-output').value = JSON.stringify(profile, null, 2);
-        }).catch(error => {
-            console.error('Error:', error);
-        });
-    }
+      return digest.then(d => base64encode(d));
+  }
 
-    // Other functions remain the same as in your original code
+  function getToken(clientId, redirectUri, code) {
+      const codeVerifier = localStorage.getItem('code_verifier');
+      const body = new URLSearchParams({
+          grant_type: 'authorization_code',
+          code: code,
+          redirect_uri: redirectUri,
+          client_id: clientId,
+          code_verifier: codeVerifier
+      });
+
+      return fetch('https://accounts.spotify.com/api/token', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/x-www-form-urlencoded'
+          },
+          body: body
+      })
+          .then(response => {
+              if (!response.ok) {
+                  throw new Error('HTTP status ' + response.status);
+              }
+              return response.json();
+          })
+          .then(data => {
+              localStorage.setItem('access_token', data.access_token);
+              const expirationTime = Date.now() / 1000 + data.expires_in;
+              localStorage.setItem('token_expires_at', expirationTime);
+              localStorage.setItem('refresh_token', data.refresh_token);
+              document.getElementById('get-token').style.display = 'none';
+              return data.access_token;
+          })
+          .catch(error => {
+              console.error('Error:', error);
+          });
+  }
+
+  function getProfile(accessToken) {
+      fetch('https://api.spotify.com/v1/me', {
+          headers: {
+              Authorization: 'Bearer ' + accessToken
+          }
+      }).then(response => {
+          if (!response.ok) {
+              throw new Error('HTTP status ' + response.status);
+          }
+          return response.json();
+      }).then(profile => {
+          console.log(profile);
+          document.getElementById('api-output').value = JSON.stringify(profile, null, 2);
+      }).catch(error => {
+          console.error('Error:', error);
+      });
+  }
+
+  // Other functions remain the same as in your original code
 
 </script>
+
 </body>
 </html>
