@@ -23,10 +23,6 @@
             <p>Paste your Client ID here: <input id="paste-client-id" data-sync="client_id" type="text" size="40" placeholder="Client ID"> <span class="note">(we won't steal it, promise!)</span></p>
 
         <section class="card">
-            <h2 id="getting-an-authorization-code">2. Getting an Authorization Code</h2>
-            <p>The first thing your app needs to do is request authorization from a Spotify user. This will send the user to Spotify, have them log in, and then redirect back to your app with an <em>authorization code</em> in the query string of the URL.</p>
-
-            <p>You will need two things to request an auth code:</p>
             <ul>
                 <li>
                     <code>client_id</code>: <input id="login-client-id" data-sync="client_id" type="text" size="40" placeholder="Client ID">
@@ -36,21 +32,10 @@
                 </li>
             </ul>
 
-            <h3 id="making-the-request">Making the Request</h3>
-            <p></p>
-
-            <p>You will need code to generate a <code>code_challenge</code> and a <code>code_verifier</code>. Spotify provides source code to create these in its <a href="https://developer.spotify.com/documentation/web-api/tutorials/code-pkce-flow#code-verifier">developer documentation</a>. You should use their provided code in your own project.</p>
-
-            <p>Here are the values we've generated for this tutorial: <button id="generate-button" type="button" class="small">Regenerate</button></p>
-
             <ul>
                 <li><code>code_verifier</code>: <code id="code-verifier" class="graybg"></code></li>
                 <li><code>code_challenge</code>: <code id="code-challenge" class="graybg"></code></li>
             </ul>
-
-            <p>You should generate your own values programatically each time you make a new authorization request. You will need to store the <code>code_verifier</code> in <code>localStorage</code>, since the page will be reloaded after Spotify redirects the user. Read <a href="#code-verifier-and-code-challenge">the section below</a> to see why this is important!</p>
-
-            <p>Here is an example of making the authorization request via JavaScript (updated with your request values):</p>
 
             <!-- HTML generated using hilite.me -->
             <div class="code-display">
