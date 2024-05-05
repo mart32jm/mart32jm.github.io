@@ -53,30 +53,6 @@
             <p>Here is an example of a request that exchanges the auth code for an access token:</p>
 
             <!-- HTML generated using hilite.me -->
-            <div class="code-display">
-                <pre style="margin: 0; line-height: 125%"><span style="color: #408080; font-style: italic">// codeVerifier MUST be the same as the one used to make the code challenge for the auth request</span>
-<span style="color: #008000; font-weight: bold">const</span> codeVerifier <span style="color: #666666">=</span> localStorage.getItem(<span style="color: #BA2121">&#39;code_verifier&#39;</span>);
-
-<span style="color: #008000; font-weight: bold">const</span> payload <span style="color: #666666">=</span> {
-    method<span style="color: #666666">:</span> <span style="color: #BA2121">&#39;POST&#39;</span>,
-    headers<span style="color: #666666">:</span> {
-        <span style="color: #BA2121">&#39;Content-Type&#39;</span><span style="color: #666666">:</span> <span style="color: #BA2121">&#39;application/x-www-form-urlencoded&#39;</span>,
-    },
-    body<span style="color: #666666">:</span> <span style="color: #008000; font-weight: bold">new</span> URLSearchParams({
-        grant_type<span style="color: #666666">:</span> <span style="color: #BA2121">&#39;authorization_code&#39;</span>,
-        client_id<span style="color: #666666">:</span> <span style="color: #BA2121">&#39;<span data-sync="client_id"></span>&#39;</span>,
-        redirect_uri<span style="color: #666666">:</span> <span style="color: #BA2121">&#39;<span data-sync="redirect_uri"></span>&#39;</span>,
-        code_verifier<span style="color: #666666">:</span> codeVerifier,
-        code<span style="color: #666666">:</span> authCode, <span style="color: #408080; font-style: italic">// From the URL</span>
-    }),
-}
-
-<span style="color: #008000; font-weight: bold">const</span> response <span style="color: #666666">=</span> await fetch(<span style="color: #BA2121">&#39;https://accounts.spotify.com/api/token&#39;</span>, payload);
-<span style="color: #008000; font-weight: bold">const</span> data <span style="color: #666666">=</span> await response.json();
-
-<span style="color: #008000; font-weight: bold">const</span> accessToken <span style="color: #666666">=</span> data.access_token;
-</pre>
-            </div>
 
             <h3 id="try-token">Try It Yourself!</h3>
             <p>If you've successfully obtained an auth code, you can click this button to exchange it for an access token:</p>
