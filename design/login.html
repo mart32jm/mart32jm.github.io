@@ -48,13 +48,6 @@
                 <li><code>code_challenge</code>: <code id="code-challenge" class="graybg"></code></li>
             </ul>
 
-            <aside>
-                <h4 id="code-verifier-and-code-challenge">Learn More: Code Verifier and Code Challenge</h4>
-                <p>When you send the authorization request, you must provide a "code challenge" to the server. This code challenge is a one-way hash of a random string known as the "code verifier".</p>
-                <p>You first give the <em>code challenge</em> when sending the user to Spotify to login. The server will return an <em>authorization code</em> back to your app <span class="note">(which could be stolen by an attacker, since it is given in the URL)</span>.</p>
-                <p>Then you send the <em>authorization code</em> to Spotify in a <code>POST</code> request. But this time, you include the original <em>code verifier</em> string! The server can re-hash the <em>code verifier</em> and make sure it matches the <em>code challenge</em> you sent earlier. This way, it's able to ensure that you are the same one who sent the original request. This is the basis for PKCE. You can read more about it <a href="https://pazel.dev/teach-me-pkce-proof-key-for-code-exchange-in-5-minutes">here</a>.</p>
-            </aside>
-
             <h3 id="try-login">Try It Yourself!</h3>
             <p>If you've set the <code>client_id</code> and the <code>redirect_uri</code> above, you can click this button to request an authorization code:</p>
             <button id="login-button" class="primary" type="button">Login with Spotify</button>
