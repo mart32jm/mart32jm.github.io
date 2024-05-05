@@ -18,6 +18,10 @@
     </header>
 
     <main>
+        <section class="card">
+  
+            <p>Paste your Client ID here: <input id="paste-client-id" data-sync="client_id" type="text" size="40" placeholder="Client ID"> <span class="note">(we won't steal it, promise!)</span></p>
+
             <h3 id="redirect-uri">Redirect URI</h3>
             <p>You will also need to register the <code>redirect_uri</code> for your app.</p>
             <p>Basically, the user will click a link on your site that will redirect them to Spotify so that they can log in and authorize your app. Once they've done so, Spotify will send the user back to your site. The <code>redirect_uri</code> tells Spotify where they should send them. For security reasons, Spotify requires that the <code>redirect_uri</code> be an <a href="https://en.wikipedia.org/wiki/Uniform_Resource_Identifier">absolute URI</a> and that it be registered with your app.</p>
