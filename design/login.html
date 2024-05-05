@@ -32,7 +32,6 @@
 <h1>Spotify PKCE Demo</h1>
 <p>"Client-side-only" Spotify api consumption. find source code here <a href="https://github.com/hcientist/Spotify-PKCE-Example">https://github.com/hcientist/Spotify-PKCE-Example</a></p>
 <button type="button" id="authorize">Authorize</button>
-<button type="button" id="reset-storage">Reset Local Storage</button>
 
 <div id="profile-info" style="display: none;">
     <img id="profile-image" src="" alt="Profile Image">
@@ -122,6 +121,49 @@
         return digest.then(d => base64encode(d));
     }
 
+    // Remove query parameters from URL
+    window.history.replaceState({}, document.title, ".");
+
+    function getToken(clientId, redirectUri, code) {
+        const codeVerifier = localStorage.getItem('code_verifier');
+        const body = new URLSearchParams({
+            grant_type: 'authorization_code',
+            code: code,
+            redirect_uri: redirectUri,
+            client_id: clientId,
+            code_verifier: codeVerifier
+        });
+
+        return fetch('https://accounts.spotify.com/api/token', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: body
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('HTTP status ' + response.status);
+                }
+                return response.json();
+            })
+            .then(data => {
+                localStorage.setItem('access_token', data.access_token);
+                document.getElementById('get-token').style.display = 'none';
+                // Reload the page to update the token
+                window.location.reload();
+                return data.access_token;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }
+    
+    // Automatically print the icon below the authorize button
+    const iconUrl = 'https://example.com/icon.png'; // Replace with the actual URL of the icon
+    const icon = document.createElement('img');
+    icon.src = iconUrl;
+    document.body.appendChild(icon);
 </script>
 </body>
 </html>
