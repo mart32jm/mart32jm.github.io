@@ -70,6 +70,7 @@
     const token = localStorage.getItem('access_token');
     if (token) {
         getUserProfile(token)
+            console.log("hi!!!")
             .then((profile) => {
                 document.getElementById('profile-image').src = profile.images[profile.images.length - 1].url;
                 document.getElementById('profile-name').textContent = profile.display_name;
