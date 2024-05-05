@@ -48,34 +48,6 @@
                 <li><code>code_challenge</code>: <code id="code-challenge" class="graybg"></code></li>
             </ul>
 
-            <p>You should generate your own values programatically each time you make a new authorization request. You will need to store the <code>code_verifier</code> in <code>localStorage</code>, since the page will be reloaded after Spotify redirects the user. Read <a href="#code-verifier-and-code-challenge">the section below</a> to see why this is important!</p>
-
-            <p>Here is an example of making the authorization request via JavaScript (updated with your request values):</p>
-
-            <!-- HTML generated using hilite.me -->
-            <div class="code-display">
-                <pre style="margin: 0; line-height: 125%"><span style="color: #008000">window</span>.localStorage.setItem(<span style="color: #BA2121">&#39;code_verifier&#39;</span>, codeVerifier); <span style="color: #408080; font-style: italic">// Save the code verifier for later</span>
-
-<span style="color: #008000; font-weight: bold">const</span> clientId <span style="color: #666666">=</span> <span style="color: #BA2121">&#39;<span data-sync="client_id"></span>&#39;</span>;
-<span style="color: #008000; font-weight: bold">const</span> redirectUri <span style="color: #666666">=</span> <span style="color: #BA2121">&#39;<span data-sync="redirect_uri"></span>&#39;</span>;
-
-<span style="color: #008000; font-weight: bold">const</span> scope <span style="color: #666666">=</span> <span style="color: #BA2121">&#39;user-read-private user-read-email&#39;</span>; <span style="color: #408080; font-style: italic">// Specifies what user data your app can access!</span>
-<span style="color: #008000; font-weight: bold">const</span> authUrl <span style="color: #666666">=</span> <span style="color: #008000; font-weight: bold">new</span> URL(<span style="color: #BA2121">&quot;https://accounts.spotify.com/authorize&quot;</span>)
-
-<span style="color: #008000; font-weight: bold">const</span> params <span style="color: #666666">=</span>  {
-    response_type<span style="color: #666666">:</span> <span style="color: #BA2121">&#39;code&#39;</span>,
-    client_id<span style="color: #666666">:</span> clientId,
-    scope<span style="color: #666666">:</span> scope,
-    code_challenge_method<span style="color: #666666">:</span> <span style="color: #BA2121">&#39;S256&#39;</span>,
-    code_challenge<span style="color: #666666">:</span> codeChallenge, <span style="color: #408080; font-style: italic">// The hashed code verifier</span>
-    redirect_uri<span style="color: #666666">:</span> redirectUri,
-}
-
-authUrl.search <span style="color: #666666">=</span> <span style="color: #008000; font-weight: bold">new</span> URLSearchParams(params).toString();
-<span style="color: #008000">window</span>.location.href <span style="color: #666666">=</span> authUrl.toString(); <span style="color: #408080; font-style: italic">// Redirect the user</span>
-</pre>
-            </div>
-
             <aside>
                 <h4 id="code-verifier-and-code-challenge">Learn More: Code Verifier and Code Challenge</h4>
                 <p>When you send the authorization request, you must provide a "code challenge" to the server. This code challenge is a one-way hash of a random string known as the "code verifier".</p>
