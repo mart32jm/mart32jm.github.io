@@ -27,7 +27,6 @@
         </section>
         <section class="card">
             <h2 id="getting-an-authorization-code">2. Getting an Authorization Code</h2>
-            <p>The first thing your app needs to do is request authorization from a Spotify user. This will send the user to Spotify, have them log in, and then redirect back to your app with an <em>authorization code</em> in the query string of the URL.</p>
 
             <p>You will need two things to request an auth code:</p>
             <ul>
@@ -41,8 +40,6 @@
 
             <h3 id="making-the-request">Making the Request</h3>
             <p></p>
-
-            <p>You will need code to generate a <code>code_challenge</code> and a <code>code_verifier</code>. Spotify provides source code to create these in its <a href="https://developer.spotify.com/documentation/web-api/tutorials/code-pkce-flow#code-verifier">developer documentation</a>. You should use their provided code in your own project.</p>
 
             <p>Here are the values we've generated for this tutorial: <button id="generate-button" type="button" class="small">Regenerate</button></p>
 
