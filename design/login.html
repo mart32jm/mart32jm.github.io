@@ -20,17 +20,6 @@
     <main>
 
         <section class="card">
-            <h2 id="registering-your-app-with-spotify">1. Registering Your App with Spotify</h2>
-            <p>Before you can start using the Spotify API, you need to register your app on the <a href="https://developer.spotify.com/dashboard">Spotify Developer Dashboard.</a></p>
-            <p>Once you've registered your app, you'll receive a <code>client_id</code> that you'll need to use to authenticate your app. (Don't worry about the <code>client_secret</code>, this is used for other authorization flows.)</p>
-            <p>Paste your Client ID here: <input id="paste-client-id" data-sync="client_id" type="text" size="40" placeholder="Client ID"> <span class="note">(we won't steal it, promise!)</span></p>
-
-            <h3 id="redirect-uri">Redirect URI</h3>
-            <p>You will also need to register the <code>redirect_uri</code> for your app.</p>
-            <p>Basically, the user will click a link on your site that will redirect them to Spotify so that they can log in and authorize your app. Once they've done so, Spotify will send the user back to your site. The <code>redirect_uri</code> tells Spotify where they should send them. For security reasons, Spotify requires that the <code>redirect_uri</code> be an <a href="https://en.wikipedia.org/wiki/Uniform_Resource_Identifier">absolute URI</a> and that it be registered with your app.</p>
-            <p>Go to the <a href="https://developer.spotify.com/dashboard">Developer Dashboard</a> and add a redirect URI. You should use something like <code>http://localhost:8080/index.html</code> if you're running on a local server. Once your app is deployed, use the full URL of your deployed page. <span class="note">(Spotify treats localhost and 127.0.0.1 as different, so make sure you specify the right one - or both!)</span></p>
-        </section>
-        <section class="card">
             <h2 id="getting-an-authorization-code">2. Getting an Authorization Code</h2>
             <p>The first thing your app needs to do is request authorization from a Spotify user. This will send the user to Spotify, have them log in, and then redirect back to your app with an <em>authorization code</em> in the query string of the URL.</p>
 
