@@ -74,9 +74,16 @@
             <p>You can get the auth code from the URL like so, using URLSearchParams to parse the query string (<a href="https://www.jackfranklin.co.uk/blog/url-search-params/">read more!</a>):</p>
 
             <!-- HTML generated using hilite.me -->
+            <div class="code-display">
+                <pre style="margin: 0; line-height: 125%"><span style="color: #008000; font-weight: bold">const</span> urlParams <span style="color: #666666">=</span> <span style="color: #008000; font-weight: bold">new</span> URLSearchParams(<span style="color: #008000">window</span>.location.search);
+<span style="color: #008000; font-weight: bold">const</span> authCode <span style="color: #666666">=</span> urlParams.get(<span style="color: #BA2121">&#39;code&#39;</span>);
+</pre>
+            </div>
+
+            <p>Now you can exchange this code for an access token. This token is your "golden ticket 🎫" to the <a href="https://developer.spotify.com/documentation/web-api">Spotify Web API</a>. We will need to make another request to the Spotify server, this time a <code>POST</code> request.</p>
 
             <h3 id="making-the-token-request">Making the Request</h3>
-            
+            <p>There are a few body parameters, which need to be in the <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/POST#example"><code>x-www-form-urlencoded</code></a> format. These are:</p>
             <ul>
                 <li><code>grant_type</code>: <code class="graybg">"authorization_code"</code> <span class="note">(a string literal)</span></li>
                 <li><code>client_id</code>: <code data-sync="client_id" class="graybg"></code> <span class="note">(same as before)</span></li>
@@ -85,9 +92,16 @@
                 <li><code>code</code>: <code id="auth-code-body" class="graybg"></code> <span class="note">(from the URL)</span></li>
             </ul>
 
-            <p>Access Token:</p>
+            <p>Here is an example of a request that exchanges the auth code for an access token:</p>
+
+            <!-- HTML generated using hilite.me -->
+
+
+            <h3 id="try-token">Try It Yourself!</h3>
+            <p>If you've successfully obtained an auth code, you can click this button to exchange it for an access token:</p>
             <button id="token-button" class="primary" type="button">Get Access Token</button>
             <p>Your access token is: <code id="access-token" class="graybg"></code></p>
+            <p class="note">This token will last for an hour, after which you will need to request a new one. There is a mechanism to <a href="https://developer.spotify.com/documentation/web-api/tutorials/refreshing-tokens">refresh the token</a>, so the user doesn't need to log in again.</p>
 
         </section>
         <section class="card">
@@ -97,6 +111,7 @@
             <img id="profile-image" src="https://placehold.co/300x300" alt="User profile">
         </section>
     </main>
+
 
     <script src="../scripts/spotify.js"></script>
     <script src="../scripts/tutorial.js"></script>
