@@ -84,7 +84,13 @@
 
             <h3 id="making-the-token-request">Making the Request</h3>
             <p>There are a few body parameters, which need to be in the <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/POST#example"><code>x-www-form-urlencoded</code></a> format. These are:</p>
-
+            <ul>
+                <li><code>grant_type</code>: <code class="graybg">"authorization_code"</code> <span class="note">(a string literal)</span></li>
+                <li><code>client_id</code>: <code data-sync="client_id" class="graybg"></code> <span class="note">(same as before)</span></li>
+                <li><code>redirect_uri</code>: <code data-sync="redirect_uri" class="graybg"></code> <span class="note">(same one used to request the auth code)</span></li>
+                <li><code>code_verifier</code>: <code id="code-verifier-body" class="graybg"></code> <span class="note">(value from <code>localStorage</code>)</span></li>
+                <li><code>code</code>: <code id="auth-code-body" class="graybg"></code> <span class="note">(from the URL)</span></li>
+            </ul>
 
             <p>Access Token:</p>
             <button id="token-button" class="primary" type="button">Get Access Token</button>
