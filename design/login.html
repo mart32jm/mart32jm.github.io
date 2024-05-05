@@ -4,7 +4,6 @@
 <head>
     <title>Spotify API Tutorial</title>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="styles/spotify.css">
     <link rel="icon" href="https://open.spotifycdn.com/cdn/images/favicon.0f31d2ea.ico">
 </head>
 <body>
@@ -18,29 +17,12 @@
     </header>
 
     <main>
+
         <section class="card">
-            <h2 id="introduction">Introduction</h2>
-            <p>The Spotify API uses a framework known as <a href="https://oauth.net/2/">OAuth 2.0</a>, which provides different "flows" or procedures for authorization with a web service.</p>
-            <p>We will be following the <a href="https://developer.spotify.com/documentation/web-api/tutorials/code-pkce-flow">Authorization Code with PKCE Flow</a>, which is what Spotify recommends for this kind of client-side app with no backend. The code snippets provided in this tutorial are taken from the Spotify documentation.</p>
-            <p>The source code for this tutorial and demo can be found on <a href="https://github.com/wanghci/spotify-api-tutorial/">GitHub</a>.</p>
-            <p>Here's a brief overview of the steps we'll be taking:</p>
-            <ol>
-                <li>Registering Your App with Spotify</li>
-                <li>Getting an Authorization Code</li>
-                <li>Exchanging the Authorization Code for an Access Token</li>
-                <li>Making Requests to the Spotify API</li>
-            </ol>
-        </section>
-        <section class="card">
-            <h2 id="registering-your-app-with-spotify">1. Registering Your App with Spotify</h2>
-            <p>Before you can start using the Spotify API, you need to register your app on the <a href="https://developer.spotify.com/dashboard">Spotify Developer Dashboard.</a></p>
-            <p>Once you've registered your app, you'll receive a <code>client_id</code> that you'll need to use to authenticate your app. (Don't worry about the <code>client_secret</code>, this is used for other authorization flows.)</p>
+            
             <p>Paste your Client ID here: <input id="paste-client-id" data-sync="client_id" type="text" size="40" placeholder="Client ID"> <span class="note">(we won't steal it, promise!)</span></p>
 
-            <h3 id="redirect-uri">Redirect URI</h3>
-            <p>You will also need to register the <code>redirect_uri</code> for your app.</p>
-            <p>Basically, the user will click a link on your site that will redirect them to Spotify so that they can log in and authorize your app. Once they've done so, Spotify will send the user back to your site. The <code>redirect_uri</code> tells Spotify where they should send them. For security reasons, Spotify requires that the <code>redirect_uri</code> be an <a href="https://en.wikipedia.org/wiki/Uniform_Resource_Identifier">absolute URI</a> and that it be registered with your app.</p>
-            <p>Go to the <a href="https://developer.spotify.com/dashboard">Developer Dashboard</a> and add a redirect URI. You should use something like <code>http://localhost:8080/index.html</code> if you're running on a local server. Once your app is deployed, use the full URL of your deployed page. <span class="note">(Spotify treats localhost and 127.0.0.1 as different, so make sure you specify the right one - or both!)</span></p>
+            
         </section>
         <section class="card">
             <h2 id="getting-an-authorization-code">2. Getting an Authorization Code</h2>
