@@ -32,6 +32,7 @@
 <h1>Spotify PKCE Demo</h1>
 <p>"Client-side-only" Spotify api consumption. find source code here <a href="https://github.com/hcientist/Spotify-PKCE-Example">https://github.com/hcientist/Spotify-PKCE-Example</a></p>
 <button type="button" id="authorize">Authorize</button>
+<button type="button" id="reset-storage">Reset Local Storage</button>
 
 <div id="profile-info" style="display: none;">
     <img id="profile-image" src="" alt="Profile Image">
@@ -79,6 +80,11 @@
                 console.error('Error:', error);
             });
     }
+
+    document.getElementById('reset-storage').addEventListener('click', () => {
+        localStorage.clear();
+        location.reload();
+    });
 
     async function getUserProfile(accessToken) {
         const response = await fetch("https://api.spotify.com/v1/me", {
