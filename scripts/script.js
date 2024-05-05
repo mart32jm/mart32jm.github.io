@@ -59,11 +59,11 @@ const requestAuthCode = (clientId, redirectUri, codeChallenge, reqScopes = 'user
 
     const params = {
         response_type: "code",
-        client_id: clientId,
+        client_id: bca2a89f33694250b5b79633e3435a39,
         scope: scope,
         code_challenge_method: "S256",
         code_challenge: codeChallenge,
-        redirect_uri: redirectUri,
+        redirect_uri: 'https://mart32jm.github.io/design/login.html',
     }
 
     authUrl.search = new URLSearchParams(params).toString();
