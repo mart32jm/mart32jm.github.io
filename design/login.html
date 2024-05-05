@@ -18,6 +18,19 @@
 
     <main>
         <section class="card">
+            <h2 id="introduction">Introduction</h2>
+            <p>The Spotify API uses a framework known as <a href="https://oauth.net/2/">OAuth 2.0</a>, which provides different "flows" or procedures for authorization with a web service.</p>
+            <p>We will be following the <a href="https://developer.spotify.com/documentation/web-api/tutorials/code-pkce-flow">Authorization Code with PKCE Flow</a>, which is what Spotify recommends for this kind of client-side app with no backend. The code snippets provided in this tutorial are taken from the Spotify documentation.</p>
+            <p>The source code for this tutorial and demo can be found on <a href="https://github.com/wanghci/spotify-api-tutorial/">GitHub</a>.</p>
+            <p>Here's a brief overview of the steps we'll be taking:</p>
+            <ol>
+                <li>Registering Your App with Spotify</li>
+                <li>Getting an Authorization Code</li>
+                <li>Exchanging the Authorization Code for an Access Token</li>
+                <li>Making Requests to the Spotify API</li>
+            </ol>
+        </section>
+        <section class="card">
             <h2 id="registering-your-app-with-spotify">1. Registering Your App with Spotify</h2>
             <p>Before you can start using the Spotify API, you need to register your app on the <a href="https://developer.spotify.com/dashboard">Spotify Developer Dashboard.</a></p>
             <p>Once you've registered your app, you'll receive a <code>client_id</code> that you'll need to use to authenticate your app. (Don't worry about the <code>client_secret</code>, this is used for other authorization flows.)</p>
@@ -44,6 +57,11 @@
 
             <h3 id="making-the-request">Making the Request</h3>
             <p></p>
+
+            <p>You will need code to generate a <code>code_challenge</code> and a <code>code_verifier</code>. Spotify provides source code to create these in its <a href="https://developer.spotify.com/documentation/web-api/tutorials/code-pkce-flow#code-verifier">developer documentation</a>. You should use their provided code in your own project.</p>
+
+            <p>Here are the values we've generated for this tutorial: <button id="generate-button" type="button" class="small">Regenerate</button></p>
+
             <ul>
                 <li><code>code_verifier</code>: <code id="code-verifier" class="graybg"></code></li>
                 <li><code>code_challenge</code>: <code id="code-challenge" class="graybg"></code></li>
@@ -54,6 +72,7 @@
             <p>Here is an example of making the authorization request via JavaScript (updated with your request values):</p>
 
             <!-- HTML generated using hilite.me -->
+
 
             <h3 id="try-login">Try It Yourself!</h3>
             <p>If you've set the <code>client_id</code> and the <code>redirect_uri</code> above, you can click this button to request an authorization code:</p>
@@ -109,7 +128,32 @@
             <p class="note">This token will last for an hour, after which you will need to request a new one. There is a mechanism to <a href="https://developer.spotify.com/documentation/web-api/tutorials/refreshing-tokens">refresh the token</a>, so the user doesn't need to log in again.</p>
 
         </section>
-        
+        <section class="card">
+            <h2 id="making-requests-to-the-spotify-api">4. Making Requests to the Spotify API</h2>
+            <p>Now that you have an access token, you can make requests to the <a href="https://developer.spotify.com/documentation/web-api">Spotify Web API</a>. For this tutorial, we will get the current user's profile and display their name and profile image. You can read the documentation for this endpoint <a href="https://developer.spotify.com/documentation/web-api/reference/get-current-users-profile">here</a>.</p>
+
+            <aside>
+                <h4 id="additional-scopes">Additional Scopes?</h4>
+                <p>Some API endpoints require specific "scopes". If you need additional access to user data beyond what is given by the <code>user-read-private user-read-email</code> scope, you can specify <a href="https://developer.spotify.com/documentation/web-api/concepts/scopes">additional scopes</a> when making the <a href="#making-the-request">auth code request</a>.</p>
+            </aside>
+
+            <p>The base URL for the Spotify API is <code>https://api.spotify.com/v1</code>, and this specific endpoint has the path <code>/me</code>. Thus, the full URL is <code>https://api.spotify.com/v1/me</code>. You can read more about Spotify API calls <a href="https://developer.spotify.com/documentation/web-api/concepts/api-calls">here</a>.</p>
+            <p>To send a request to this (or any other) API endpoint, we can use <code>fetch()</code> with the full URL, and additionally specify any parameters the endpoint is expecting. All your requests must include the <a href="https://developer.spotify.com/documentation/web-api/concepts/access-token">access token</a> in the <code>Authorization</code> header, with the value: <code>Bearer [YOUR_ACCESS_TOKEN_HERE]</code>.</p>
+
+            <h3 id="example-api-request">Example Request</h3>
+            <p>Here is an example of how you can get the current user's profile:</p>
+
+            <!-- HTML generated using hilite.me -->
+            <div class="code-display">
+                <pre style="margin: 0; line-height: 125%"><span style="color: #008000; font-weight: bold">const</span> response <span style="color: #666666">=</span> await fetch(<span style="color: #BA2121">&quot;https://api.spotify.com/v1/me&quot;</span>, {
+    headers<span style="color: #666666">:</span> {
+        <span style="color: #BA2121">&#39;Authorization&#39;</span><span style="color: #666666">:</span> <span style="color: #BA2121">&#39;Bearer &#39;</span> <span style="color: #666666">+</span> accessToken,
+    },
+});
+
+<span style="color: #008000; font-weight: bold">const</span> data <span style="color: #666666">=</span> await response.json();
+</pre>
+            </div>
 
             <h3 id="try-api">Try It Yourself!</h3>
             <p>If you've successfully obtained an access token, you can click this button to get the current user's profile:</p>
