@@ -1,7 +1,7 @@
 const accessToken = localStorage.getItem("access_token");
 if (accessToken) {
     // Display an alert message
-    window.alert(document.getElementById("access-token"));
+    window.alert(accessToken);
 
     document.getElementById("access-token").textContent = accessToken;
     // Call getUserProfile only if accessToken is available
