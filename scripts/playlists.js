@@ -1,10 +1,18 @@
-let accessToken = localStorage.getItem("access_token");
+const accessToken = localStorage.getItem("access_token");
 if (accessToken) {
     document.getElementById("access-token").textContent = accessToken;
+    // Call getUserProfile only if accessToken is available
+    getUserProfile(accessToken)
+        .then(profile => {
+            document.getElementById("profile-name").textContent = profile.display_name;
+            document.getElementById("profile-image").src = profile.images[0].url;
+        })
+        .catch(error => {
+            console.error("Error fetching user profile:", error);
+        });
 } else {
     document.getElementById("access-token").textContent = "(No access token found in local storage 😢)";
 }
-
 
 const getUserProfile = async (accessToken) => {
     const response = await fetch("https://api.spotify.com/v1/me", {
