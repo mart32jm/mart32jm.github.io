@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stats</title>
+    <link rel="stylesheet" href="../styles/style.css">
+    <style>
+        .stats-container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+        .stat {
+            margin-bottom: 20px;
+        }
+        .stat-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .stat-details {
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="generator.html">Generator</a>
+        <a href="playlists.html">Playlists</a>
+        <a href="stats.html" class="selected">Stats</a>
+        <a href="help.html">Help</a>
+        <a href="login.html" id="loginButton">Login</a>
+    </nav>
+    
+    <div class="stats-container">
+        <div class="stat">
+            <h2 class="stat-title">Your Listening Habits</h2>
+            <p class="stat-details">You listened to music for a total of 500 hours this year.</p>
+            <p class="stat-details">You discovered 100 new artists.</p>
+            <p class="stat-details">You listened to music from 20 different genres.</p>
+        </div>
+        <div class="stat">
+            <h2 class="stat-title">Top Genres</h2>
+            <p class="stat-details">Your top genre was Pop, with 30% of your total listening time.</p>
+            <p class="stat-details">Followed by Rock, with 25% of your total listening time.</p>
+            <p class="stat-details">And Hip-Hop, with 20% of your total listening time.</p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

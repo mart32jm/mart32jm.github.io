@@ -3,52 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stats</title>
+    <title>Playlists</title>
     <link rel="stylesheet" href="../styles/style.css">
-    <style>
-        .stats-container {
-            max-width: 800px;
-            margin: 20px auto;
-            padding: 0 20px;
-        }
-        .stat {
-            margin-bottom: 20px;
-        }
-        .stat-title {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-        .stat-details {
-            font-size: 16px;
-        }
-    </style>
+    <script src="../scripts/playlists.js"></script>
 </head>
 <body>
     <nav>
         <a href="index.html">Home</a>
         <a href="generator.html">Generator</a>
-        <a href="playlists.html">Playlists</a>
-        <a href="stats.html" class="selected">Stats</a>
+        <a href="playlists.html" class="selected">Playlists</a>
+        <a href="stats.html">Stats</a>
         <a href="help.html">Help</a>
         <a href="login.html" id="loginButton">Login</a>
     </nav>
-    
-    <div class="stats-container">
-        <div class="stat">
-            <h2 class="stat-title">Your Listening Habits</h2>
-            <p class="stat-details">You listened to music for a total of 500 hours this year.</p>
-            <p class="stat-details">You discovered 100 new artists.</p>
-            <p class="stat-details">You listened to music from 20 different genres.</p>
-        </div>
-        <div class="stat">
-            <h2 class="stat-title">Top Genres</h2>
-            <p class="stat-details">Your top genre was Pop, with 30% of your total listening time.</p>
-            <p class="stat-details">Followed by Rock, with 25% of your total listening time.</p>
-            <p class="stat-details">And Hip-Hop, with 20% of your total listening time.</p>
-        </div>
-    </div>
 
-    <script src="script.js"></script>
+    <h1>Here is your Spotify Profile Data!</h1>
+
+    <section id="profile">
+    <h2>Logged in as: <span id="displayName"></span></h2>
+    <span id="avatar"></span>
+    <ul>
+        <li>User ID: <span id="id"></span></li>
+        <li>Email: <span id="email"></span></li>
+        <li>Spotify URI: <a id="uri" href="#"></a></li>
+        <li>Link: <a id="url" href="#"></a></li>
+        <li>Profile Image: <span id="imgUrl"></span></li>
+    </ul>
+    </section>
+
+    <div class="spotify-button" id="get-top-tracks">Get Top Tracks</div>
+    <div class="spotify-button recommendations" id="getrecommendations" style="display: none">Get Recommendations</div>
+
+
 </body>
 </html>
