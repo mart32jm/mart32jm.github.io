@@ -35,6 +35,7 @@ if (accessToken) {
             const profile = data.profile;
             const playlists = data.playlists;
             populateUI(profile);
+            getTopTracks(accessToken);
 
             // Display user profile
             document.getElementById("profile-name").textContent = profile.display_name;
@@ -63,14 +64,6 @@ function populateUI(profile) {
     document.getElementById("url").innerText = profile.href;
     document.getElementById("url").setAttribute("href", profile.href);
 }
-
-document.getElementById('get-top-tracks').addEventListener('click', function() {
-    getTopTracks(access_token);                                       
-  });
-  
-  document.getElementById('getrecommendations').addEventListener('click', function() {  
-    getRecommendations(access_token)
-  });
 
   function getTopTracks(access_token) {
     $.ajax({
