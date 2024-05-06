@@ -1,29 +1,41 @@
-// Authorization token that must have been created previously. See : https://developer.spotify.com/documentation/web-api/concepts/authorization
-
-async function fetchWebApi(endpoint, method, body) {
-  const res = await fetch(`https://api.spotify.com/${endpoint}`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-    method,
-    body:JSON.stringify(body)
-  });
-  return await res.json();
-}
-
-async function getTopTracks(){
-  // Endpoint reference : https://developer.spotify.com/documentation/web-api/reference/get-users-top-artists-and-tracks
-  return (await fetchWebApi(
-    'v1/me/top/tracks?time_range=long_term&limit=5', 'GET'
-  )).items;
-}
-
-const topTracks = await getTopTracks();
-console.log(
-  topTracks?.map(
-    ({name, artists}) =>
-      `${name} by ${artists.map(artist => artist.name).join(', ')}`
-  )
-);
-
 const accessToken = localStorage.getItem("access_token");
+const getRecommendation = async () => {
+    try {
+        const params = new URLSearchParams({
+            limit: 1,
+            market: "US",
+            seed_genres: ["acoustic", "rock", "pop", "classical"],
+        });
+
+        const response = await fetch("https://api.spotify.com/v1/recommendations?" + params, {
+            headers: {
+                Authorization: 'Bearer ' + accessToken,
+            }
+        });
+
+        if (!response.ok) {
+            if (response.status === 429) {
+                alert("Too many requests! Please try again later.");
+                window.location.href = "index.html";
+            }
+            throw new Error("Failed to get song recommendation!");
+        }
+        
+        // Display the song recommendation
+        const data = await response.json();
+        const song = data.tracks[0];
+
+        document.getElementById("song-img").src = song.album.images[0].url;
+        document.getElementById("song-title").textContent = song.name + (song.explicit ? " (Explicit 🔥)" : "");
+        document.getElementById("song-artist").textContent = song.artists[0].name;
+        document.getElementById("song-display").hidden = false;
+
+        // Store the song URI for later use
+        document.getElementById("song-play-btn").href = song.external_urls.spotify;
+        document.getElementById("song-save-btn").dataset.songId = song.id; // Store the song ID in a data attribute on the element
+    } catch (error) {
+        alert(error);
+    }
+}
+
+getRecommendation(); // Don't forget to call the function!

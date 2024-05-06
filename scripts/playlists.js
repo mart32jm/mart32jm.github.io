@@ -35,13 +35,11 @@ if (accessToken) {
             const profile = data.profile;
             const playlists = data.playlists;
             populateUI(profile);
-            console.log(playlists[0])
 
             // Display user profile
             document.getElementById("profile-name").textContent = profile.display_name;
             document.getElementById("profile-image").src = profile.images[0].url;
 
-            document.getElementById("name").textContent = playlists[0].name;
 
         })
         .catch(error => {
