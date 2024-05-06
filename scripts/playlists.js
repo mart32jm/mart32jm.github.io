@@ -28,8 +28,6 @@ const getUserProfile = async (accessToken) => {
 
 const accessToken = localStorage.getItem("access_token");
 if (accessToken) {
-    // Display an alert message
-    window.alert(accessToken);
 
     // Call getUserProfile only if accessToken is available
     getUserProfile(accessToken)
