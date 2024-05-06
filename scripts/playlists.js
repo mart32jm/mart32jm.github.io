@@ -39,14 +39,6 @@ if (accessToken) {
             // Display user profile
             document.getElementById("profile-name").textContent = profile.display_name;
             document.getElementById("profile-image").src = profile.images[0].url;
-
-            // Display playlists
-            const playlistsList = document.getElementById("playlists-list");
-            playlists.forEach(playlist => {
-                const playlistItem = document.createElement("li");
-                playlistItem.textContent = playlist.name;
-                playlistsList.appendChild(playlistItem);
-            });
         })
         .catch(error => {
             console.error("Error fetching user profile and playlists:", error);
