@@ -1,5 +1,5 @@
 // Authorization token that must have been created previously. See : https://developer.spotify.com/documentation/web-api/concepts/authorization
-const accessToken = localStorage.getItem("access_token");
+
 async function fetchWebApi(endpoint, method, body) {
   const res = await fetch(`https://api.spotify.com/${endpoint}`, {
     headers: {
@@ -25,3 +25,5 @@ console.log(
       `${name} by ${artists.map(artist => artist.name).join(', ')}`
   )
 );
+
+const accessToken = localStorage.getItem("access_token");

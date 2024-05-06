@@ -26,22 +26,6 @@ const getUserProfile = async (accessToken) => {
     return { profile: profileData, playlists: playlistsData.items };
 };
 
-
-  async function getTopTracks(){
-    // Endpoint reference : https://developer.spotify.com/documentation/web-api/reference/get-users-top-artists-and-tracks
-    return (await fetchWebApi(
-      'v1/me/top/tracks?time_range=long_term&limit=5', 'GET'
-    )).items;
-  }
-  
-  const topTracks = await getTopTracks();
-  console.log(
-    topTracks?.map(
-      ({name, artists}) =>
-        `${name} by ${artists.map(artist => artist.name).join(', ')}`
-    )
-  );
-
 const accessToken = localStorage.getItem("access_token");
 if (accessToken) {
 
@@ -80,3 +64,4 @@ function populateUI(profile) {
     document.getElementById("url").innerText = profile.href;
     document.getElementById("url").setAttribute("href", profile.href);
 }
+
