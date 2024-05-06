@@ -35,7 +35,7 @@ if (accessToken) {
             const profile = data.profile;
             const playlists = data.playlists;
             populateUI(profile);
-            getTopTracks(accessToken);
+            console.log(playlists);
 
             // Display user profile
             document.getElementById("profile-name").textContent = profile.display_name;
@@ -64,59 +64,3 @@ function populateUI(profile) {
     document.getElementById("url").innerText = profile.href;
     document.getElementById("url").setAttribute("href", profile.href);
 }
-
-  function getTopTracks(access_token) {
-    $.ajax({
-      url: 'https://api.spotify.com/v1/me/top/tracks?limit=10',
-      headers: {
-        'Authorization': 'Bearer ' + access_token
-      },
-      success: function(response) {
-        $(".recommendations").show();
-        mapOverSongs(response.items);
-      }
-    });
-  }
-
-  function mapOverSongs(songs) {
-    $("#getrecommendations").show();
-    songs.map( function(song) {
-          var list = "<input type='checkbox' name='top-tracks' value='" +
-                  song.id + "'>" +
-                  "<a href='" + song.external_urls.spotify + "'>" +
-                  song.name +
-                  " by " + song.artists[0].name +
-                  " from the album " + song.album.name +
-                  "</a><br><br>";
-          document.getElementById('top-tracks').innerHTML += list;
-    });
-}
-
-function getRecommendations(access_token) {
-    var checkboxes = document.getElementsByName('top-tracks');
-    var selected = "";
-    for (var i=0, n=checkboxes.length; i<n; i++) {
-        if (checkboxes[i].checked) {
-            selected += checkboxes[i].value+",";
-        }
-    }
-    selected = selected.slice(0, -1);
-    $.ajax({
-        url: 'https://api.spotify.com/v1/recommendations?market=US&seed_tracks=' + selected + '&limit=10',
-        headers: {
-        'Authorization': 'Bearer ' + access_token
-        },
-        success: function(response) {
-            mapOverRecommendations(response.tracks);
-        }
-    });
-}
-
-function mapOverRecommendations(recommendations) {
-    $(".recommendations-table").show();
-    recommendations.map(function (song) {
-      var list =
-          "<tr><td><a target='_blank' href='" + song.external_urls.spotify + "'>" + song.name + "</a></td><td>" + song.artists[0].name + "</td><td>" + song.album.name + "</td></tr>";
-      document.getElementById('recommendations').innerHTML += list;
-    });
-  }
