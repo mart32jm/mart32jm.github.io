@@ -12,7 +12,7 @@ const getUserProfile = async (accessToken) => {
     }
 
     // Fetch user's playlists
-    const playlistsResponse = await fetch("https://api.spotify.com/v1/me/playlists?limit=5", {
+    const playlistsResponse = await fetch("https://api.spotify.com/v1/me/playlists?limit=10", {
         headers: {
             'Authorization': 'Bearer ' + accessToken,
         },
@@ -35,11 +35,12 @@ if (accessToken) {
             const profile = data.profile;
             const playlists = data.playlists;
             populateUI(profile);
-            console.log(data);
 
             // Display user profile
             document.getElementById("profile-name").textContent = profile.display_name;
             document.getElementById("profile-image").src = profile.images[0].url;
+
+            document.getElementById("name").textContent = playlists[0].name;
 
         })
         .catch(error => {
