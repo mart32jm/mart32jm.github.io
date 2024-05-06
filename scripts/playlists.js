@@ -35,7 +35,7 @@ if (accessToken) {
             const profile = data.profile;
             const playlists = data.playlists;
             populateUI(profile);
-            console.log(playlists);
+            console.log(data);
 
             // Display user profile
             document.getElementById("profile-name").textContent = profile.display_name;
