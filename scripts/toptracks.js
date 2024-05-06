@@ -1,4 +1,3 @@
-const accessToken = localStorage.getItem("access_token");
 const getRecommendation = async () => {
     try {
         const params = new URLSearchParams({
@@ -9,7 +8,7 @@ const getRecommendation = async () => {
 
         const response = await fetch("https://api.spotify.com/v1/recommendations?" + params, {
             headers: {
-                Authorization: 'Bearer ' + accessToken,
+                Authorization: 'Bearer ' + localStorage.getItem("access_token"),
             }
         });
 
